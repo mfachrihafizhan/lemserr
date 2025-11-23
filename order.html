@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Tombol Hamburger -->
+  <!-- Hamburger -->
   <div id="sidebarToggle" class="sidebar-hamburger">
     <svg width="40" height="40" viewBox="0 0 40 40">
       <rect y="9" width="32" height="5" rx="2.2" fill="#454545"/>
@@ -50,9 +50,8 @@
       <button class="order-footer-btn" id="orderBtn" disabled>Pesan Sekarang</button>
     </div>
   </main>
-  <!-- SCRIPT SHOW/HIDE SIDEBAR & ORDER LOGIC -->
   <script>
-    // --- SIDEBAR LOGIC ---
+    // --- SIDEBAR ---
     const sidebar = document.getElementById("sidebar");
     const toggleBtn = document.getElementById("sidebarToggle");
     toggleBtn.onclick = function(e) {
@@ -69,15 +68,14 @@
 
     // --- ORDER LOGIC ---
     const PRODUK = [
-      {id:"large",nama:"Lemon Sereh - Cup Large",harga:12000,desc:"Description duis aute irure dolor...",img:"image.jpg"},
-      {id:"medium",nama:"Lemon Sereh - Cup Medium",harga:8000,desc:"Description duis aute irure dolor...",img:"image.jpg"},
-      {id:"small",nama:"Lemon Sereh - Cup Small",harga:6000,desc:"Description duis aute irure dolor...",img:"image.jpg"},
+      {id:"large",nama:"Lemon Sereh - Cup Large",harga:12000,desc:"Description duis aute irure dolor..."},
+      {id:"medium",nama:"Lemon Sereh - Cup Medium",harga:8000,desc:"Description duis aute irure dolor..."},
+      {id:"small",nama:"Lemon Sereh - Cup Small",harga:6000,desc:"Description duis aute irure dolor..."},
     ];
     const state={}; PRODUK.forEach(p=>{state[p.id]={checked:false,qty:0};});
     function renderRows(){const el=document.getElementById("orderRows");el.innerHTML="";PRODUK.forEach(p=>{const st=state[p.id];el.innerHTML+=`
     <div class="order-row" id="row-${p.id}">
       <input class="order-checkbox" type="checkbox" ${st.checked?"checked":""} onchange="onCheck('${p.id}',this.checked)">
-      <img class="order-img" src="${p.img}" alt="${p.nama}">
       <div class="order-info">
         <div class="order-name">${p.nama}</div>
         <div class="order-desc">${p.desc}</div>
@@ -107,7 +105,7 @@
         }
       });
       pesan += `Total (${totalQty} pesanan): Rp. ${totalHarga.toLocaleString()}`;
-      const waNumber = "628567788737";
+      const waNumber = "6282112291916";
       const waURL = `https://wa.me/${waNumber}?text=${encodeURIComponent(pesan)}`;
       window.location.href = waURL;
     };
