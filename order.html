@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keranjang Belanja</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside class="sidebar">
+  <div class="sidebar-hamburger">
+    <svg width="40" height="40" viewBox="0 0 40 40">
+      <rect y="9"  width="32" height="5" rx="2.2" fill="#454545"/>
+      <rect y="19" width="32" height="5" rx="2.2" fill="#454545"/>
+      <rect y="29" width="32" height="5" rx="2.2" fill="#454545"/>
+    </svg>
+  </div>
+  <div class="sidebar-pen">
+    <svg height="32" width="32" viewBox="0 0 32 32">
+      <rect x="9" y="15" width="14" height="5" rx="1.8" fill="#e4667b" transform="rotate(-45 16 16)" />
+      <rect x="7" y="22" width="7" height="2" rx="1" fill="#e4667b"/>
+      <rect x="12" y="18" width="7" height="3.5" rx="1.5" fill="#fff" transform="rotate(-45 16 16)"/>
+    </svg>
+  </div>
+  <nav class="sidebar-menu">
+    <a href="index.html" class="sidebar-link">
+      <span class="sidebar-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32">
+          <circle cx="16" cy="16" r="13" fill="#e4667b"/>
+          <polygon points="16,8 18,14 24,14 19,18 21,24 16,20 11,24 13,18 8,14 14,14" fill="#fff"/>
+        </svg>
+      </span>
+      <span class="sidebar-text">Profil</span>
+    </a>
+    <a href="tentang.html" class="sidebar-link">
+      <span class="sidebar-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32">
+          <circle cx="16" cy="16" r="13" fill="#e4667b"/>
+          <polygon points="16,8 18,14 24,14 19,18 21,24 16,20 11,24 13,18 8,14 14,14" fill="#fff"/>
+        </svg>
+      </span>
+      <span class="sidebar-text">Tentang</span>
+    </a>
+    <a href="produk.html" class="sidebar-link">
+      <span class="sidebar-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32">
+          <circle cx="16" cy="16" r="13" fill="#e4667b"/>
+          <polygon points="16,8 18,14 24,14 19,18 21,24 16,20 11,24 13,18 8,14 14,14" fill="#fff"/>
+        </svg>
+      </span>
+      <span class="sidebar-text">Produk</span>
+    </a>
+    <a href="order.html" class="sidebar-link">
+      <span class="sidebar-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32">
+          <circle cx="16" cy="16" r="13" fill="#e4667b"/>
+          <polygon points="16,8 18,14 24,14 19,18 21,24 16,20 11,24 13,18 8,14 14,14" fill="#fff"/>
+        </svg>
+      </span>
+      <span class="sidebar-text">Order</span>
+    </a>
+  </nav>
+</aside>
+  <main class="order-main">
+    <div class="order-title">Keranjang Belanja</div>
+    <div class="order-table-header">
+      <span style="width:70px"></span>
+      <span style="flex:2;">Produk</span>
+      <span class="harga">Harga Satuan</span>
+      <span class="qty">Kuantitas</span>
+    </div>
+    <div id="orderRows"></div>
+    <div class="order-footer">
+      <div class="order-footer-left">
+        <label><input type="checkbox" id="selectAll" /> Pilih Semua</label>
+      </div>
+      <div class="order-footer-total">
+        Total (<span class="total-pesanan">0 Pesanan</span>) : <b>Rp. <span id="totalHarga">0</span></b>
+      </div>
+      <button class="order-footer-btn" id="orderBtn" disabled>Pesan Sekarang</button>
+    </div>
+  </main>
+  <script>
+    // Data produk & harga
+    const PRODUK = [
+      {id:"large",nama:"Lemon Sereh - Cup Large",harga:12000,desc:"Description duis aute irure dolor...",img:"image.jpg"},
+      {id:"medium",nama:"Lemon Sereh - Cup Medium",harga:8000,desc:"Description duis aute irure dolor...",img:"image.jpg"},
+      {id:"small",nama:"Lemon Sereh - Cup Small",harga:6000,desc:"Description duis aute irure dolor...",img:"image.jpg"},
+    ];
+    const state={}; PRODUK.forEach(p=>{state[p.id]={checked:false,qty:0};});
+    function renderRows(){const el=document.getElementById("orderRows");el.innerHTML="";PRODUK.forEach(p=>{const st=state[p.id];el.innerHTML+=`
+    <div class="order-row" id="row-${p.id}">
+      <input class="order-checkbox" type="checkbox" ${st.checked?"checked":""} onchange="onCheck('${p.id}',this.checked)">
+      <img class="order-img" src="${p.img}" alt="${p.nama}">
+      <div class="order-info">
+        <div class="order-name">${p.nama}</div>
+        <div class="order-desc">${p.desc}</div>
+      </div>
+      <div class="order-harga">Rp. ${p.harga.toLocaleString()}</div>
+      <div class="order-qty">
+        <button class="order-qty-btn" onclick="minusQty('${p.id}')">-</button>
+        <span class="order-qty-val">${st.qty}</span>
+        <button class="order-qty-btn" onclick="plusQty('${p.id}')">+</button>
+      </div>
+    </div>`;});updateFooter();}
+    function onCheck(id,val){state[id].checked=val;renderRows();}
+    function minusQty(id){if(state[id].qty>0)state[id].qty--;renderRows();}
+    function plusQty(id){state[id].qty++;state[id].checked=true;renderRows();}
+    function updateFooter(){document.getElementById("selectAll").checked=PRODUK.every(p=>state[p.id].checked);let totalHarga=0,totalQty=0;PRODUK.forEach(p=>{if(state[p.id].checked&&state[p.id].qty>0){totalHarga+=p.harga*state[p.id].qty;totalQty+=state[p.id].qty;}});document.getElementById("totalHarga").innerText=totalHarga.toLocaleString();document.querySelector(".total-pesanan").innerText=totalQty+" Pesanan";document.getElementById("orderBtn").disabled=(totalQty===0);}
+    document.getElementById("selectAll").onchange=function(){PRODUK.forEach(p=>state[p.id].checked=this.checked);renderRows();};
+    document.getElementById("orderBtn").onclick = function() {
+  // data pesanan & total
+  let pesan = "Halo, saya ingin memesan:\n";
+  let totalHarga = 0, totalQty = 0;
+  PRODUK.forEach(p => {
+    const s = state[p.id];
+    if (s.checked && s.qty > 0) {
+      pesan += `- ${p.nama} x ${s.qty} = Rp. ${ (p.harga*s.qty).toLocaleString() }\n`;
+      totalHarga += p.harga * s.qty;
+      totalQty += s.qty;
+    }
+  });
+  pesan += `Total (${totalQty} pesanan): Rp. ${totalHarga.toLocaleString()}`;
+  const waNumber = "628567788737";
+  const waURL = `https://wa.me/${waNumber}?text=${encodeURIComponent(pesan)}`;
+  window.location.href = waURL;
+};
+    renderRows();window.onCheck=onCheck;window.minusQty=minusQty;window.plusQty=plusQty;
+  </script>
+</body>
+</html>
