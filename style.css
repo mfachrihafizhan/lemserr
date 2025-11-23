@@ -5,14 +5,28 @@ body {
   color: #222;
 }
 
-/* SIDEBAR */
+/* SIDEBAR RESPONSIF */
 .sidebar {
-  width: 110px; background: #ffe391; height: 100vh;
-  position: fixed; top: 0; left: 0;
-  display: flex; flex-direction: column; align-items: center;
-  padding-top: 20px; z-index: 100; border-right: 1px solid #eee686;
+  width: 110px;
+  background: #ffe391;
+  height: 100vh;
+  position: fixed;
+  top: 0; left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  z-index: 200;
+  border-right: 1px solid #eee686;
+  transition: transform 0.3s;
 }
-.sidebar-hamburger { margin-bottom: 32px; }
+.sidebar-hamburger {
+  display: none;
+  position: fixed;
+  top: 14px; left: 14px; z-index: 300;
+  background: #ffe391; border-radius: 7px; padding: 7px;
+  cursor: pointer;
+}
 .sidebar-pen { margin-bottom: 32px; margin-top: 5px; }
 .sidebar-menu {
   display: flex; flex-direction: column; gap: 38px;
@@ -20,8 +34,8 @@ body {
 }
 .sidebar-link {
   display: flex; flex-direction: column; align-items: center;
-  text-decoration: none; color: #454545; font-weight: bold; font-size: 19px;
-  transition: color 0.15s;
+  text-decoration: none; color: #454545;
+  font-weight: bold; font-size: 19px; transition: color 0.15s;
 }
 .sidebar-link:visited { color: #454545; }
 .sidebar-link:hover .sidebar-text { color: #e4667b; }
@@ -35,11 +49,9 @@ body {
 }
 
 /* MAIN LAYOUT */
-main {
-  margin-left: 120px;
-  padding: 38px 15px;
-}
+main { margin-left: 120px; padding: 38px 15px; }
 
+/* CARD, DETAIL, PROFIL */
 .card, .produk-main {
   background: #fffde8;
   border-radius: 20px;
@@ -48,8 +60,6 @@ main {
   padding: 28px 18px;
   margin-bottom: 30px;
 }
-
-/* PROFIL & DETAIL */
 .profil-flex, .card-detail-flex {
   display: flex; align-items: flex-start; gap: 26px;
 }
@@ -97,7 +107,7 @@ main {
 .produk-desc h3 { margin: 0 0 6px 0; font-size: 17px; color: #c46414; }
 .produk-meta { font-size: 12px; color: #947c2b; margin-bottom: 6px; }
 
-/* PRODUK GRID UNTUK produk.html */
+/* PRODUK GRID */
 .produk-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -207,6 +217,22 @@ main {
   .produk-grid { gap: 16px; }
   .order-footer { padding: 10px; font-size: 14px; flex-direction: column; gap: 10px; }
   .order-footer-btn { font-size: 14px; padding: 9px 18px; width: 100%; box-sizing: border-box; }
+}
+
+/* SIDEBAR LOGIC MOBILE */
+@media (max-width: 600px) {
+  .sidebar {
+    transform: translateX(-110%);
+    box-shadow: 4px 0 24px rgba(125,92,6,.08);
+  }
+  .sidebar.active {
+    transform: translateX(0);
+  }
+  .sidebar-hamburger { display: block; }
+}
+@media (min-width: 601px) {
+  .sidebar { transform: none !important; }
+  .sidebar-hamburger { display: none; }
 }
 
 ::-webkit-scrollbar { background: transparent; }
