@@ -68,9 +68,9 @@
 
     // --- ORDER LOGIC ---
     const PRODUK = [
-      {id:"large",nama:"Lemon Sereh - Cup Large",harga:12000,desc:"Description duis aute irure dolor..."},
-      {id:"medium",nama:"Lemon Sereh - Cup Medium",harga:8000,desc:"Description duis aute irure dolor..."},
-      {id:"small",nama:"Lemon Sereh - Cup Small",harga:6000,desc:"Description duis aute irure dolor..."},
+      {id:"large",nama:"Lemon Sereh - Cup Large",harga:12000,desc:"Minuman segar beraroma lemon dan sereh."},
+      {id:"medium",nama:"Lemon Sereh - Cup Medium",harga:8000,desc:"Porsi medium, rasa tetap segar."},
+      {id:"small",nama:"Lemon Sereh - Cup Small",harga:6000,desc:"Porsi kecil praktis untuk dinikmati."},
     ];
     const state={}; PRODUK.forEach(p=>{state[p.id]={checked:false,qty:0};});
     function renderRows(){const el=document.getElementById("orderRows");el.innerHTML="";PRODUK.forEach(p=>{const st=state[p.id];el.innerHTML+=`
