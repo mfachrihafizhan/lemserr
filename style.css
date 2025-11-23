@@ -289,5 +289,47 @@ main { margin-left: 120px; padding: 38px 15px; }
   }
 }
 
+.cs-popup {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 999;
+  background: #ffffffee;
+  border-radius: 20px;
+  box-shadow: 0 3px 18px rgba(110,80,50,.13);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  transition: box-shadow 0.18s;
+}
+.cs-popup-btn {
+  background: #e4667b;
+  color: #fff;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 13px;
+  padding: 10px 18px;
+  box-shadow: 0 2px 7px rgba(220,30,77,.12);
+  transition: background 0.18s;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cs-popup-btn:hover {
+  background: #d0546b;
+}
+@media (max-width: 600px) {
+  .cs-popup {
+    right: 6vw;
+    bottom: 6vw;
+    padding: 7px 7vw;
+    font-size: 13px;
+  }
+  .cs-popup-btn {
+    font-size: 13px;
+    padding: 9px 9vw;
+  }
+}
 
 ::-webkit-scrollbar { background: transparent; }
