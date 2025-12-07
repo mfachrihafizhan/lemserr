@@ -1,4 +1,4 @@
-// ====== UTIL LOCALSTORAGE ======
+// ====== LOCALSTORAGE ======
 function getData(key, defaultValue) {
   const raw = localStorage.getItem(key);
   if (!raw) return defaultValue;
@@ -13,7 +13,6 @@ function setData(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-// ====== KONSTANTA KEY ======
 const KEY_USERS = 'ls_users';
 const KEY_CURRENT_USER = 'ls_current_user';
 const KEY_ORDERS = 'ls_orders';
@@ -63,7 +62,7 @@ function logoutUser() {
   location.reload();
 }
 
-// ====== UPDATE TOMBOL LOGIN/LOGOUT/PROFIL DI SIDEBAR ======
+// ====== TOMBOL LOGIN/LOGOUT/PROFIL ======
 function updateAuthUI() {
   const btnLoginOpen = document.getElementById('btn-login-open');
   const btnLogout = document.getElementById('btn-logout');
@@ -125,7 +124,7 @@ function deleteAccount() {
   users = users.filter(u => u.id !== currentUser.id);
   saveUserList(users);
 
-  // ulasan sekarang di Supabase, jadi tidak perlu hapus dari localStorage
+
   let orders = getData(KEY_ORDERS, []);
   orders = orders.filter(o => o.userId !== currentUser.id);
   setData(KEY_ORDERS, orders);
@@ -252,7 +251,7 @@ function renderAddressList() {
   });
 }
 
-// ambil alamat pertama user
+// alamat pertama user
 function getPrimaryAddress() {
   const currentUser = getCurrentUser();
   if (!currentUser) return null;
@@ -264,7 +263,7 @@ function getPrimaryAddress() {
   return u.addresses[0];
 }
 
-// ====== REVIEW / ULASAN DENGAN SUPABASE ======
+// ====== REVIEW / ULASAN ======
 async function addReview(produkId, rating, text) {
   const currentUser = getCurrentUser();
   if (!currentUser) {
@@ -319,7 +318,7 @@ function initReviewForms() {
   });
 }
 
-// ====== ULASAN PAGE (Supabase) ======
+// ====== ULASAN PAGE ======
 async function renderAllReviews(filterProdukId) {
   const container = document.getElementById('ulasan-list');
   if (!container) return;

@@ -43,8 +43,6 @@
       <a href="ulasan.html" class="sidebar-link">
         <span class="sidebar-icon">⭐</span><span class="sidebar-text">Ulasan</span>
       </a>
-
-      <!-- Auth menu -->
       <a href="auth.html" id="btn-login-open" class="sidebar-link">
         <span class="sidebar-icon">🔑</span><span class="sidebar-text">Login</span>
       </a>
@@ -96,7 +94,7 @@
     </section>
   </main>
 
-  <!-- SCRIPT SHOW/HIDE SIDEBAR -->
+  <!-- SHOW/HIDE SIDEBAR -->
   <script>
     const sidebar = document.getElementById("sidebar");
     const toggleBtn = document.getElementById("sidebarToggle");
@@ -120,7 +118,6 @@
 
       const total = harga * qty;
 
-      // simpan ke daftar order (localStorage) via app.js
       if (typeof addOrder === 'function') {
         addOrder(namaProduk, qty, total);
       } else {

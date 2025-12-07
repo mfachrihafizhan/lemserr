@@ -6,14 +6,12 @@
   <title>Keranjang Belanja</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <!-- Customer Service -->
 <div id="cs-popup" class="cs-popup">
   <a href="https://wa.me/6282112291916" target="_blank" class="cs-popup-btn">
     🟢CS
   </a>
 </div>
-
 <body>
   <!-- Hamburger -->
   <div id="sidebarToggle" class="sidebar-hamburger">
@@ -43,7 +41,6 @@
       <a href="ulasan.html" class="sidebar-link">
         <span class="sidebar-icon">⭐</span><span class="sidebar-text">Ulasan</span>
       </a>
-
       <a href="auth.html" id="btn-login-open" class="sidebar-link">
         <span class="sidebar-icon">🔑</span><span class="sidebar-text">Login</span>
       </a>
@@ -97,7 +94,7 @@
       }
     });
 
-    // --- ORDER LOGIC (KERANJANG) ---
+    // --- ORDER LOGIC ---
     const PRODUK = [
       {id:"large", nama:"Lemon Sereh - Cup Large", harga:12000, desc:"Minuman segar beraroma lemon dan sereh."},
       {id:"medium", nama:"Lemon Sereh - Cup Medium", harga:8000, desc:"Porsi medium, rasa tetap segar."},
@@ -196,7 +193,6 @@
           totalHarga += subTotal;
           totalQty += s.qty;
 
-          // simpan ke daftar order (localStorage) via app.js
           if (typeof addOrder === 'function') {
             addOrder(p.nama, s.qty, subTotal);
           }
@@ -207,7 +203,7 @@
 
       pesan += `\nTotal (${totalQty} pesanan): Rp. ${totalHarga.toLocaleString()}\n`;
 
-      // tambahkan data alamat dari profil (app.js: getPrimaryAddress)
+      // tambahkan data alamat dari profil
       if (typeof getPrimaryAddress === 'function') {
         const addr = getPrimaryAddress();
         if (addr) {
