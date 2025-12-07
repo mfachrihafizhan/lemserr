@@ -125,8 +125,7 @@ function deleteAccount() {
   users = users.filter(u => u.id !== currentUser.id);
   saveUserList(users);
 
-  // NOTE: ulasan sekarang di Supabase, jadi di sini tidak dihapus lokal lagi.
-
+  // ulasan sekarang di Supabase, jadi tidak perlu hapus dari localStorage
   let orders = getData(KEY_ORDERS, []);
   orders = orders.filter(o => o.userId !== currentUser.id);
   setData(KEY_ORDERS, orders);
@@ -278,16 +277,14 @@ async function addReview(produkId, rating, text) {
     return;
   }
 
-  const { data, error } = await supabaseClient
+  const { error } = await supabaseClient
     .from('reviews')
     .insert({
       produkId,
       userName: currentUser.nama,
       rating: Number(rating),
       text
-    })
-    .select()
-    .single();
+    });
 
   if (error) {
     console.error(error);
@@ -322,7 +319,7 @@ function initReviewForms() {
   });
 }
 
-// ====== ULASAN PAGE (ulasan.html, Supabase) ======
+// ====== ULASAN PAGE (Supabase) ======
 async function renderAllReviews(filterProdukId) {
   const container = document.getElementById('ulasan-list');
   if (!container) return;
@@ -600,7 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderOrderList();
 
   const ulasanList = document.getElementById('ulasan-list');
-  if (ulasanList && window.supabaseClient) {
+  if (ulasanList) {
     const filterSelect = document.getElementById('filterProduk');
     if (filterSelect) {
       filterSelect.addEventListener('change', () => {
