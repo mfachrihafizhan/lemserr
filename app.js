@@ -332,7 +332,7 @@ async function renderAllReviews(filterProdukId) {
   let query = supabaseClient
     .from('reviews')
     .select('*')
-    .order('createdAt', { ascending: false });
+    .order('created_at', { ascending: false });
 
   if (filterProdukId && filterProdukId !== 'all') {
     query = query.eq('produkId', filterProdukId);
