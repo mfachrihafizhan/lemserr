@@ -16,7 +16,6 @@ function setData(key, value) {
 // ====== KONSTANTA KEY ======
 const KEY_USERS = 'ls_users';
 const KEY_CURRENT_USER = 'ls_current_user';
-const KEY_REVIEWS = 'ls_reviews';
 const KEY_ORDERS = 'ls_orders';
 
 // ====== FUNGSI USER / AUTH ======
@@ -126,10 +125,7 @@ function deleteAccount() {
   users = users.filter(u => u.id !== currentUser.id);
   saveUserList(users);
 
-  // bersihkan review & order milik user
-  let reviews = getData(KEY_REVIEWS, []);
-  reviews = reviews.filter(r => r.userId !== currentUser.id);
-  setData(KEY_REVIEWS, reviews);
+  // NOTE: ulasan sekarang di Supabase, jadi di sini tidak dihapus lokal lagi.
 
   let orders = getData(KEY_ORDERS, []);
   orders = orders.filter(o => o.userId !== currentUser.id);
@@ -257,7 +253,7 @@ function renderAddressList() {
   });
 }
 
-// ambil alamat pertama user (atau bisa kamu ganti jadi alamat "utama")
+// ambil alamat pertama user
 function getPrimaryAddress() {
   const currentUser = getCurrentUser();
   if (!currentUser) return null;
@@ -266,121 +262,41 @@ function getPrimaryAddress() {
   const u = users.find(x => x.id === currentUser.id);
   if (!u || !u.addresses || !u.addresses.length) return null;
 
-  return u.addresses[0]; // pakai alamat pertama dulu
+  return u.addresses[0];
 }
 
-// ====== REVIEW / ULASAN PRODUK PER-PRODUK ======
-function addReview(produkId, rating, text) {
+// ====== REVIEW / ULASAN DENGAN SUPABASE ======
+async function addReview(produkId, rating, text) {
   const currentUser = getCurrentUser();
   if (!currentUser) {
     alert('Harus login untuk mengirim ulasan.');
     return;
   }
 
-  const reviews = getData(KEY_REVIEWS, []);
-  const review = {
-    id: Date.now(),
-    produkId,
-    userId: currentUser.id,
-    userName: currentUser.nama,
-    rating: Number(rating),
-    text,
-    createdAt: new Date().toISOString()
-  };
-  reviews.push(review);
-  setData(KEY_REVIEWS, reviews);
+  if (!window.supabaseClient) {
+    alert('Supabase belum siap.');
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from('reviews')
+    .insert({
+      produkId,
+      userName: currentUser.nama,
+      rating: Number(rating),
+      text
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+    alert('Gagal menyimpan ulasan.');
+    return;
+  }
+
   alert('Ulasan tersimpan.');
-
-  renderReviewsForProduct(produkId);
   renderAllReviewsCurrentFilter();
-}
-
-function updateReview(id, rating, text) {
-  const currentUser = getCurrentUser();
-  if (!currentUser) return;
-
-  const reviews = getData(KEY_REVIEWS, []);
-  const idx = reviews.findIndex(r => r.id === id && r.userId === currentUser.id);
-  if (idx === -1) {
-    alert('Tidak bisa edit ulasan ini.');
-    return;
-  }
-  reviews[idx].rating = Number(rating);
-  reviews[idx].text = text;
-  setData(KEY_REVIEWS, reviews);
-  alert('Ulasan diperbarui.');
-  renderReviewsForProduct(reviews[idx].produkId);
-  renderAllReviewsCurrentFilter();
-}
-
-function deleteReview(id) {
-  const currentUser = getCurrentUser();
-  if (!currentUser) return;
-  if (!confirm('Hapus ulasan ini?')) return;
-
-  let reviews = getData(KEY_REVIEWS, []);
-  const target = reviews.find(r => r.id === id);
-  if (!target || target.userId !== currentUser.id) {
-    alert('Tidak bisa hapus ulasan ini.');
-    return;
-  }
-  const produkId = target.produkId;
-  reviews = reviews.filter(r => r.id !== id);
-  setData(KEY_REVIEWS, reviews);
-  renderReviewsForProduct(produkId);
-  renderAllReviewsCurrentFilter();
-}
-
-function renderReviewsForProduct(produkId) {
-  const produkElem = document.querySelector(`.produk[data-produk-id="${produkId}"]`);
-  if (!produkElem) return;
-  const listElem = produkElem.querySelector('.review-list');
-  if (!listElem) return;
-
-  const currentUser = getCurrentUser();
-  const reviews = getData(KEY_REVIEWS, []).filter(r => r.produkId === produkId);
-
-  if (!reviews.length) {
-    listElem.innerHTML = '<p>Belum ada ulasan.</p>';
-    return;
-  }
-
-  let html = '';
-  reviews.forEach(r => {
-    const isOwner = currentUser && currentUser.id === r.userId;
-    html += `
-      <div class="review-item" data-id="${r.id}">
-        <p><strong>${r.userName}</strong> - Rating: ${r.rating}/5</p>
-        <p>${r.text}</p>
-        ${isOwner ? `
-          <button class="btn-edit-review">Edit</button>
-          <button class="btn-hapus-review">Hapus</button>
-        ` : ''}
-      </div>
-    `;
-  });
-  listElem.innerHTML = html;
-
-  listElem.querySelectorAll('.btn-edit-review').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const item = btn.closest('.review-item');
-      const id = Number(item.dataset.id);
-      const r = reviews.find(x => x.id === id);
-      if (!r) return;
-      const form = produkElem.querySelector('.form-review');
-      form.querySelector('.review-rating').value = r.rating;
-      form.querySelector('.review-text').value = r.text;
-      form.dataset.editId = id;
-    });
-  });
-
-  listElem.querySelectorAll('.btn-hapus-review').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const item = btn.closest('.review-item');
-      const id = Number(item.dataset.id);
-      deleteReview(id);
-    });
-  });
 }
 
 function initReviewForms() {
@@ -394,39 +310,45 @@ function initReviewForms() {
       e.preventDefault();
       const rating = form.querySelector('.review-rating').value;
       const text = form.querySelector('.review-text').value;
-      const editId = form.dataset.editId;
 
       if (!rating || !text.trim()) {
         alert('Rating dan ulasan wajib diisi.');
         return;
       }
 
-      if (editId) {
-        updateReview(Number(editId), rating, text);
-        delete form.dataset.editId;
-      } else {
-        addReview(produkId, rating, text);
-      }
+      addReview(produkId, rating, text);
       form.reset();
     });
-
-    renderReviewsForProduct(produkId);
   });
 }
 
-// ====== ULASAN PAGE (ulasan.html) ======
-function renderAllReviews(filterProdukId) {
+// ====== ULASAN PAGE (ulasan.html, Supabase) ======
+async function renderAllReviews(filterProdukId) {
   const container = document.getElementById('ulasan-list');
   if (!container) return;
 
-  const allReviews = getData(KEY_REVIEWS, []);
-  let reviews = allReviews;
-
-  if (filterProdukId && filterProdukId !== 'all') {
-    reviews = allReviews.filter(r => r.produkId === filterProdukId);
+  if (!window.supabaseClient) {
+    container.innerHTML = '<p>Supabase belum siap.</p>';
+    return;
   }
 
-  // hitung summary rating
+  let query = supabaseClient
+    .from('reviews')
+    .select('*')
+    .order('createdAt', { ascending: false });
+
+  if (filterProdukId && filterProdukId !== 'all') {
+    query = query.eq('produkId', filterProdukId);
+  }
+
+  const { data: reviews, error } = await query;
+
+  if (error) {
+    console.error(error);
+    container.innerHTML = '<p>Gagal memuat ulasan.</p>';
+    return;
+  }
+
   const counts = {1:0,2:0,3:0,4:0,5:0};
   reviews.forEach(r => {
     if (counts[r.rating] != null) counts[r.rating] += 1;
@@ -438,7 +360,6 @@ function renderAllReviews(filterProdukId) {
   });
   const avg = total ? (sum / total) : 0;
 
-  // update angka summary
   const totalEl = document.getElementById('total-reviews');
   const avgEl = document.getElementById('avg-rating');
   const starsEl = document.getElementById('avg-stars');
@@ -451,7 +372,6 @@ function renderAllReviews(filterProdukId) {
     starsEl.textContent = filled + empty;
   }
 
-  // update bar & count per bintang
   for (let i = 1; i <= 5; i++) {
     const countSpan = document.getElementById('count-' + i);
     const barFill = document.getElementById('bar-' + i);
@@ -463,14 +383,12 @@ function renderAllReviews(filterProdukId) {
     }
   }
 
-  // mapping id → nama produk
   const produkNames = {
     large: 'Lemon Sereh - Cup Large',
     medium: 'Lemon Sereh - Cup Medium',
     small: 'Lemon Sereh - Cup Small'
   };
 
-  // isi list ulasan
   if (!reviews.length) {
     container.innerHTML = '<p>Belum ada ulasan.</p>';
     return;
@@ -497,7 +415,6 @@ function renderAllReviews(filterProdukId) {
   container.innerHTML = html;
 }
 
-// helper untuk refresh summary sesuai filter yang sedang dipilih
 function renderAllReviewsCurrentFilter() {
   const filterSelect = document.getElementById('filterProduk');
   if (filterSelect) {
@@ -583,10 +500,8 @@ function addOrder(namaProduk, qty, totalHarga) {
 
 // ====== INISIALISASI PER HALAMAN ======
 document.addEventListener('DOMContentLoaded', () => {
-  // sidebar login/logout/profil
   updateAuthUI();
 
-  // auth.html: login & register
   const formLogin = document.getElementById('form-login');
   const formRegister = document.getElementById('form-register');
 
@@ -613,7 +528,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // profil.html: isi profil + alamat
   const profilNama = document.getElementById('profil-nama');
   const profilEmail = document.getElementById('profil-email');
 
@@ -682,15 +596,11 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAddressList();
   }
 
-  // produk.html: form ulasan per produk
   initReviewForms();
-
-  // order-list (kalau ada halaman riwayat order terpisah)
   renderOrderList();
 
-  // ulasan.html: tampilkan semua ulasan publik + filter
   const ulasanList = document.getElementById('ulasan-list');
-  if (ulasanList) {
+  if (ulasanList && window.supabaseClient) {
     const filterSelect = document.getElementById('filterProduk');
     if (filterSelect) {
       filterSelect.addEventListener('change', () => {
