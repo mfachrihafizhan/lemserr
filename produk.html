@@ -95,56 +95,47 @@
   </main>
 
   <!-- SHOW/HIDE SIDEBAR -->
-  <script>
-    const sidebar = document.getElementById("sidebar");
-    const toggleBtn = document.getElementById("sidebarToggle");
-    toggleBtn.onclick = function(e) {
-      sidebar.classList.toggle("active");
-      e.stopPropagation();
-    };
-    document.addEventListener("click", function(e) {
-      if(window.innerWidth <= 600 &&
-         !sidebar.contains(e.target) &&
-         !toggleBtn.contains(e.target)) {
-        sidebar.classList.remove("active");
-      }
-    });
-
-    // fungsi order single product: simpan order + kirim WA
-    function orderSingleProduct(namaProduk, harga) {
-      const qtyStr = prompt('Masukkan jumlah pesanan untuk ' + namaProduk);
-      const qty = parseInt(qtyStr, 10);
-      if (!qty || qty <= 0) return;
-
-      const total = harga * qty;
-
-      if (typeof addOrder === 'function') {
-        addOrder(namaProduk, qty, total);
-      } else {
-        alert('Fungsi addOrder belum tersedia.');
-      }
-
-      let pesan = `Halo, saya ingin memesan:\n- ${namaProduk} x ${qty} = Rp. ${total.toLocaleString()}\n`;
-
-      // tambahkan alamat dari profil kalau ada
-      if (typeof getPrimaryAddress === 'function') {
-        const addr = getPrimaryAddress();
-        if (addr) {
-          pesan += `\nData Pengiriman:\n`;
-          pesan += `Nama: ${addr.nama}\n`;
-          pesan += `HP: ${addr.hp}\n`;
-          pesan += `Alamat: ${addr.detail}, ${addr.kota}, ${addr.kodepos}\n`;
-        }
-      }
-
-      const waNumber = "6282112291916";
-      const waURL = `https://wa.me/${waNumber}?text=${encodeURIComponent(pesan)}`;
-      window.open(waURL, '_blank');
-
-      alert('Pesanan disimpan. Cek halaman Order untuk melihat dan menghapus pesanan.');
+<script>
+  const sidebar = document.getElementById("sidebar");
+  const toggleBtn = document.getElementById("sidebarToggle");
+  toggleBtn.onclick = function(e) {
+    sidebar.classList.toggle("active");
+    e.stopPropagation();
+  };
+  document.addEventListener("click", function(e) {
+    if (window.innerWidth <= 600 &&
+        !sidebar.contains(e.target) &&
+        !toggleBtn.contains(e.target)) {
+      sidebar.classList.remove("active");
     }
-  </script>
+  });
 
+  // fungsi order single product: simpan order lalu pindah ke halaman order
+  function orderSingleProduct(namaProduk, harga) {
+    const qtyStr = prompt('Masukkan jumlah pesanan untuk ' + namaProduk);
+    const qty = parseInt(qtyStr, 10);
+    if (!qty || qty <= 0) return;
+
+    const total = harga * qty;
+
+    // simpan ke daftar order (localStorage) via app.js
+    if (typeof addOrder === 'function') {
+      addOrder(namaProduk, qty, total);
+    } else {
+      alert('Fungsi addOrder belum tersedia.');
+      return;
+    }
+
+    alert('Pesanan disimpan. Kamu akan diarahkan ke halaman Order.');
+    window.location.href = 'order.html';
+  }
+</script>
+<main>
+  <section class="card">
+    <h2>Pesanan Saya</h2>
+    <div id="order-list"></div>
+  </section>
+</main>
   <script src="app.js"></script>
 </body>
 </html>
