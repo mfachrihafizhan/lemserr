@@ -26,10 +26,35 @@
     <div class="sidebar-pen">
     </div>
     <nav class="sidebar-menu">
-      <a href="index.html" class="sidebar-link"><span class="sidebar-icon">🏠</span><span class="sidebar-text">Profil</span></a>
-      <a href="tentang.html" class="sidebar-link"><span class="sidebar-icon">ℹ️</span><span class="sidebar-text">Tentang</span></a>
-      <a href="produk.html" class="sidebar-link"><span class="sidebar-icon">🛒</span><span class="sidebar-text">Produk</span></a>
-      <a href="order.html" class="sidebar-link"><span class="sidebar-icon">📝</span><span class="sidebar-text">Order</span></a>
+      <a href="index.html" class="sidebar-link">
+        <span class="sidebar-icon">🏠</span><span class="sidebar-text">Profil</span>
+      </a>
+      <a href="tentang.html" class="sidebar-link">
+        <span class="sidebar-icon">ℹ️</span><span class="sidebar-text">Tentang</span>
+      </a>
+      <a href="produk.html" class="sidebar-link">
+        <span class="sidebar-icon">🛒</span><span class="sidebar-text">Produk</span>
+      </a>
+      <a href="order.html" class="sidebar-link">
+        <span class="sidebar-icon">📝</span><span class="sidebar-text">Order</span>
+      </a>
+      <a href="ulasan.html" class="sidebar-link">
+        <span class="sidebar-icon">⭐</span><span class="sidebar-text">Ulasan</span>
+      </a>
+
+
+      <!-- START: Tombol Login / Logout / Profil -->
+      <a href="auth.html" id="btn-login-open" class="sidebar-link">
+        <span class="sidebar-icon">🔑</span><span class="sidebar-text">Login</span>
+      </a>
+      <a href="#" id="btn-logout" class="sidebar-link" style="display:none;">
+        <span class="sidebar-icon">🚪</span><span class="sidebar-text">Logout</span>
+      </a>
+      <a href="profil.html" id="btn-profil" class="sidebar-link" style="display:none;">
+        <span class="sidebar-icon">👤</span><span class="sidebar-text">Profil</span>
+      </a>
+      <!-- END: Tombol Login / Logout / Profil -->
+
     </nav>
   </aside>
   <main>
@@ -63,7 +88,7 @@
       </div>
       <div class="produk-item">
         <div class="produk-desc">
-          <h3>Lemon Sereh - Cup Medium</h3>
+          <h3>Lemon Sereh - Cup Small</h3>
           <p>Porsi kecil praktis untuk dinikmati.</p>
         </div>
       </div>
@@ -85,5 +110,6 @@
       }
     });
   </script>
+  <script src="app.js"></script>
 </body>
 </html>

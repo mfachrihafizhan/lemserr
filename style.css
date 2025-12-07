@@ -333,3 +333,550 @@ main { margin-left: 120px; padding: 38px 15px; }
 }
 
 ::-webkit-scrollbar { background: transparent; }
+
+/* AUTH PAGE */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 15px;
+  background: #fffde8;
+}
+
+.auth-card {
+  background: #ffe391;
+  border-radius: 22px;
+  box-shadow: 0 8px 24px rgba(228,102,123,0.18);
+  border: 1px solid #f5debc;
+  padding: 28px 24px 26px 24px;
+  max-width: 780px;
+  width: 100%;
+}
+
+.auth-title {
+  margin-top: 0;
+  margin-bottom: 18px;
+  text-align: center;
+  font-size: 24px;
+  color: #705900;
+}
+
+.auth-forms {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.auth-column {
+  flex: 1;
+  min-width: 260px;
+  background: #fffde8;
+  border-radius: 18px;
+  padding: 18px 16px 20px 16px;
+  box-shadow: 0 4px 14px rgba(125,92,6,.08);
+  border: 1px solid #f5debc;
+}
+
+.auth-column h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 18px;
+  color: #c46414;
+}
+
+.auth-column form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-column input {
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1px solid #f1d2a4;
+  font-size: 14px;
+  outline: none;
+}
+
+.auth-column input:focus {
+  border-color: #e4667b;
+  box-shadow: 0 0 0 2px rgba(228,102,123,0.18);
+}
+
+.auth-btn {
+  background: #e4667b;
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 9px 18px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(220,30,77,.16);
+  transition: background 0.18s, transform 0.08s;
+}
+
+.auth-btn:hover {
+  background: #d0546b;
+  transform: translateY(-1px);
+}
+
+.auth-btn-secondary {
+  background: #705900;
+}
+
+.auth-btn-secondary:hover {
+  background: #5b4700;
+}
+
+.auth-back {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.auth-back a {
+  color: #c46414;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-back a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .auth-card {
+    padding: 22px 16px;
+  }
+}
+
+/* PROFIL PAGE CUSTOM */
+.profil-page {
+  margin-left: 120px;
+  padding: 38px 15px;
+}
+
+.profil-card-page {
+  margin-bottom: 24px;
+}
+
+.profil-title {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 24px;
+  color: #705900;
+}
+
+.profil-flex-page {
+  align-items: center;
+}
+
+.profil-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.profil-avatar-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #ffe391;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  box-shadow: 0 4px 12px rgba(125,92,6,.12);
+}
+
+.profil-avatar-name {
+  font-weight: bold;
+  color: #c46414;
+}
+
+.profil-desc-page p {
+  margin: 0 0 8px 0;
+}
+
+.profil-form {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 12px 0 6px 0;
+}
+
+.profil-form input {
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1px solid #f1d2a4;
+  font-size: 14px;
+  outline: none;
+}
+
+.profil-form input:focus {
+  border-color: #e4667b;
+  box-shadow: 0 0 0 2px rgba(228,102,123,0.18);
+}
+
+.profil-btn-danger {
+  background: #705900;
+}
+
+.profil-btn-danger:hover {
+  background: #5b4700;
+}
+
+.profil-back {
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.profil-back a {
+  color: #c46414;
+  text-decoration: none;
+  font-weight: 600;
+}
+.profil-back a:hover {
+  text-decoration: underline;
+}
+
+/* ALAMAT SECTION */
+.alamat-card {
+  margin-top: 10px;
+}
+
+.alamat-form {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 16px;
+}
+
+.alamat-form input,
+.alamat-form textarea {
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1px solid #f1d2a4;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+}
+
+.alamat-form textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.alamat-form input:focus,
+.alamat-form textarea:focus {
+  border-color: #e4667b;
+  box-shadow: 0 0 0 2px rgba(228,102,123,0.18);
+}
+
+.alamat-row {
+  display: flex;
+  gap: 10px;
+}
+
+.alamat-row input {
+  flex: 1;
+}
+
+.alamat-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alamat-item {
+  background: #fffde8;
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid #f5debc;
+  box-shadow: 0 2px 7px rgba(125,92,6,.07);
+  font-size: 14px;
+}
+
+.alamat-item p {
+  margin: 0 0 4px 0;
+}
+
+.alamat-item button {
+  margin-right: 6px;
+  margin-top: 4px;
+  background: #e4667b;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.alamat-item button:hover {
+  background: #d0546b;
+}
+
+@media (max-width: 600px) {
+  .profil-page {
+    margin-left: 0;
+    padding: 18px 10px 24px 10px;
+  }
+  .alamat-row {
+    flex-direction: column;
+  }
+}
+
+/* REVIEW SECTION */
+.review-section {
+  margin-top: 10px;
+  padding: 10px 12px 12px 12px;
+  background: #fffde8;
+  border-radius: 14px;
+  border: 1px solid #f5debc;
+  box-shadow: 0 2px 7px rgba(125,92,6,.07);
+}
+
+.review-section h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: #705900;
+}
+
+.form-review {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.form-review select,
+.form-review textarea {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #f1d2a4;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+
+.form-review textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.form-review select:focus,
+.form-review textarea:focus {
+  border-color: #e4667b;
+  box-shadow: 0 0 0 2px rgba(228,102,123,0.18);
+}
+
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.review-item {
+  background: #ffe391;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #f5debc;
+}
+
+.review-item p {
+  margin: 0 0 4px 0;
+}
+
+.review-item button {
+  margin-right: 6px;
+  margin-top: 4px;
+  background: #e4667b;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 4px 9px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.review-item button:hover {
+  background: #d0546b;
+}
+
+/* ULASAN PAGE */
+.ulasan-filter {
+  margin: 10px 0 14px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.ulasan-filter select {
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid #f1d2a4;
+  font-size: 14px;
+  outline: none;
+}
+
+.ulasan-filter select:focus {
+  border-color: #e4667b;
+  box-shadow: 0 0 0 2px rgba(228,102,123,0.18);
+}
+
+.ulasan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.ulasan-item {
+  background: #ffe391;
+  border-radius: 14px;
+  padding: 10px 12px;
+  border: 1px solid #f5debc;
+  box-shadow: 0 2px 8px rgba(125,92,6,.08);
+  font-size: 14px;
+}
+
+.ulasan-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.ulasan-item-nama {
+  font-weight: bold;
+  color: #c46414;
+}
+
+.ulasan-item-produk {
+  font-size: 12px;
+  color: #705900;
+}
+
+.ulasan-item-rating {
+  color: #e4667b;
+  font-weight: bold;
+}
+
+.ulasan-item-text {
+  margin: 0;
+}
+
+/* ULASAN SUMMARY */
+.ulasan-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 10px 0 20px 0;
+}
+
+.ulasan-summary-left {
+  flex: 1.5;
+}
+
+.ulasan-summary-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ulasan-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.ulasan-bar {
+  flex: 1;
+  height: 8px;
+  background: #f1d2a4;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ulasan-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: #ffc107;
+  transition: width 0.2s;
+}
+
+.ulasan-avg {
+  font-size: 36px;
+  font-weight: bold;
+  color: #705900;
+}
+
+.ulasan-stars {
+  color: #ffc107;
+  font-size: 18px;
+  margin-top: 4px;
+}
+
+.ulasan-total {
+  font-size: 13px;
+  color: #705900;
+  margin-top: 4px;
+}
+
+/* FORM ULASAN GLOBAL DI ulasan.html */
+.ulasan-add {
+  margin-top: 20px;
+  margin-bottom: 12px;
+}
+
+.ulasan-add h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #705900;
+}
+
+#form-ulasan-global {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#form-ulasan-global select,
+#form-ulasan-global textarea {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #f1d2a4;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+
+#form-ulasan-global textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+#form-ulasan-global select:focus,
+#form-ulasan-global textarea:focus {
+  border-color: #e4667b;
+  box-shadow: 0 0 0 2px rgba(228,102,123,0.18);
+}
+
+@media (max-width: 600px) {
+  .ulasan-summary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

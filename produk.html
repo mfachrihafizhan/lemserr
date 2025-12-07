@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Produk - Website Gue</title>
+  <title>Produk - Lemon Sereh</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <!-- Customer Service -->
 <div id="cs-popup" class="cs-popup">
   <a href="https://wa.me/6282112291916" target="_blank" class="cs-popup-btn">
-🟢CS
+    🟢CS
   </a>
 </div>
+
 <body>
   <!-- Tombol Hamburger -->
   <div id="sidebarToggle" class="sidebar-hamburger">
@@ -21,39 +23,79 @@
       <rect y="29" width="32" height="5" rx="2.2" fill="#454545"/>
     </svg>
   </div>
+
   <!-- Sidebar -->
   <aside id="sidebar" class="sidebar">
-    <div class="sidebar-pen">
-    </div>
+    <div class="sidebar-pen"></div>
     <nav class="sidebar-menu">
-      <a href="index.html" class="sidebar-link"><span class="sidebar-icon">🏠</span><span class="sidebar-text">Profil</span></a>
-      <a href="tentang.html" class="sidebar-link"><span class="sidebar-icon">ℹ️</span><span class="sidebar-text">Tentang</span></a>
-      <a href="produk.html" class="sidebar-link"><span class="sidebar-icon">🛒</span><span class="sidebar-text">Produk</span></a>
-      <a href="order.html" class="sidebar-link"><span class="sidebar-icon">📝</span><span class="sidebar-text">Order</span></a>
+      <a href="index.html" class="sidebar-link">
+        <span class="sidebar-icon">🏠</span><span class="sidebar-text">Profil</span>
+      </a>
+      <a href="tentang.html" class="sidebar-link">
+        <span class="sidebar-icon">ℹ️</span><span class="sidebar-text">Tentang</span>
+      </a>
+      <a href="produk.html" class="sidebar-link">
+        <span class="sidebar-icon">🛒</span><span class="sidebar-text">Produk</span>
+      </a>
+      <a href="order.html" class="sidebar-link">
+        <span class="sidebar-icon">📝</span><span class="sidebar-text">Order</span>
+      </a>
+      <a href="ulasan.html" class="sidebar-link">
+        <span class="sidebar-icon">⭐</span><span class="sidebar-text">Ulasan</span>
+      </a>
+
+      <!-- Auth menu -->
+      <a href="auth.html" id="btn-login-open" class="sidebar-link">
+        <span class="sidebar-icon">🔑</span><span class="sidebar-text">Login</span>
+      </a>
+      <a href="#" id="btn-logout" class="sidebar-link" style="display:none;">
+        <span class="sidebar-icon">🚪</span><span class="sidebar-text">Logout</span>
+      </a>
+      <a href="profil.html" id="btn-profil" class="sidebar-link" style="display:none;">
+        <span class="sidebar-icon">👤</span><span class="sidebar-text">Profil</span>
+      </a>
     </nav>
   </aside>
+
   <main>
     <section class="card produk-main">
       <h2 style="color:#705900;">Produk Kami</h2>
-      <div class="produk-grid">
+
+      <!-- PRODUK 1 -->
+      <div class="produk">
         <div class="produk-card">
           <h3>Lemon Sereh - Cup Large</h3>
           <p>Minuman segar beraroma lemon dan sereh.</p>
-          <button onclick="window.location.href='order.html'">Order Sekarang</button>
+          <button onclick="orderSingleProduct('Lemon Sereh - Cup Large', 12000)">
+            Order Sekarang
+          </button>
         </div>
+      </div>
+
+      <!-- PRODUK 2 -->
+      <div class="produk">
         <div class="produk-card">
           <h3>Lemon Sereh - Cup Medium</h3>
           <p>Porsi medium, rasa tetap segar.</p>
-          <button onclick="window.location.href='order.html'">Order Sekarang</button>
+          <button onclick="orderSingleProduct('Lemon Sereh - Cup Medium', 8000)">
+            Order Sekarang
+          </button>
         </div>
+      </div>
+
+      <!-- PRODUK 3 -->
+      <div class="produk">
         <div class="produk-card">
           <h3>Lemon Sereh - Cup Small</h3>
           <p>Porsi kecil praktis untuk dinikmati.</p>
-          <button onclick="window.location.href='order.html'">Order Sekarang</button>
+          <button onclick="orderSingleProduct('Lemon Sereh - Cup Small', 6000)">
+            Order Sekarang
+          </button>
         </div>
       </div>
     </section>
   </main>
+
   <!-- SCRIPT SHOW/HIDE SIDEBAR -->
   <script>
     const sidebar = document.getElementById("sidebar");
@@ -69,6 +111,43 @@
         sidebar.classList.remove("active");
       }
     });
+
+    // fungsi order single product: simpan order + kirim WA
+    function orderSingleProduct(namaProduk, harga) {
+      const qtyStr = prompt('Masukkan jumlah pesanan untuk ' + namaProduk);
+      const qty = parseInt(qtyStr, 10);
+      if (!qty || qty <= 0) return;
+
+      const total = harga * qty;
+
+      // simpan ke daftar order (localStorage) via app.js
+      if (typeof addOrder === 'function') {
+        addOrder(namaProduk, qty, total);
+      } else {
+        alert('Fungsi addOrder belum tersedia.');
+      }
+
+      let pesan = `Halo, saya ingin memesan:\n- ${namaProduk} x ${qty} = Rp. ${total.toLocaleString()}\n`;
+
+      // tambahkan alamat dari profil kalau ada
+      if (typeof getPrimaryAddress === 'function') {
+        const addr = getPrimaryAddress();
+        if (addr) {
+          pesan += `\nData Pengiriman:\n`;
+          pesan += `Nama: ${addr.nama}\n`;
+          pesan += `HP: ${addr.hp}\n`;
+          pesan += `Alamat: ${addr.detail}, ${addr.kota}, ${addr.kodepos}\n`;
+        }
+      }
+
+      const waNumber = "6282112291916";
+      const waURL = `https://wa.me/${waNumber}?text=${encodeURIComponent(pesan)}`;
+      window.open(waURL, '_blank');
+
+      alert('Pesanan disimpan. Cek halaman Order untuk melihat dan menghapus pesanan.');
+    }
   </script>
+
+  <script src="app.js"></script>
 </body>
 </html>

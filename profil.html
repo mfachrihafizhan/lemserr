@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tentang - Lemon Sereh</title>
+  <title>Profil Saya - Lemon Sereh</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -57,19 +57,55 @@
     </nav>
   </aside>
 
-  <main>
-    <section class="card card-detail">
-      <div class="card-detail-flex">
-        <img class="card-detail-img" src="poster.jpeg.jpeg" alt="Langkah minum lemon sereh">
-        <div class="card-detail-desc">
-          <h2>Tentang Kami</h2>
-          <div class="publish-date">Published date 23 November 2025</div>
-          <p>
-            Perjalanan kami dimulai dari dapur kecil di Bandung, ketika kami meracik minuman lemon sereh untuk keluarga. Rasanya yang segar dan aromanya yang menenangkan membuat teman dan tetangga ikut menyukai, hingga akhirnya kami mencoba menjualnya dalam jumlah sedikit.<br><br>
-            Dari pesanan harian yang awalnya hanya beberapa cup, lemon sereh kami mulai dikenal lebih luas. Media sosial membantu kami berkembang, dan perlahan UMKM kecil ini bisa mengirimkan ratusan cup setiap minggunya. Meski berkembang, kami tetap mempertahankan cara meracik yang sederhana dengan bahan-bahan fresh.<br><br>
-            Kami percaya satu produk yang dibuat dengan sepenuh hati bisa memberi banyak arti. Dengan tiga ukuran cup yang bisa dipilih, kami ingin setiap gelas lemon sereh menghadirkan kesegaran yang jujur dan apa adanya. Dari racikan rumahan hingga menjadi minuman favorit banyak orang, itulah cerita kami yang terus berlanjut.
+  <main class="profil-page">
+    <section class="card profil-card profil-card-page">
+      <h2 class="profil-title">Profil Akun</h2>
+
+      <div class="profil-flex profil-flex-page">
+        <div class="profil-avatar">
+          <div class="profil-avatar-circle">👤</div>
+          <p class="profil-avatar-name" id="profil-nama"></p>
+        </div>
+
+        <div class="profil-desc profil-desc-page">
+          <p><strong>Nama:</strong> <span id="profil-nama-text"></span></p>
+          <p><strong>Email:</strong> <span id="profil-email"></span></p>
+
+          <h3>Edit Profil</h3>
+          <form id="form-profil" class="profil-form">
+            <input type="text" id="edit-nama" placeholder="Nama lengkap">
+            <input type="email" id="edit-email" placeholder="Email">
+            <button type="submit" class="profil-btn">Simpan Profil</button>
+          </form>
+
+          <button id="btn-hapus-akun" class="profil-btn profil-btn-danger">
+            Hapus Akun
+          </button>
+
+          <p class="profil-back">
+            <a href="index.html">← Kembali ke beranda</a>
           </p>
         </div>
+      </div>
+    </section>
+
+    <!-- Section alamat pengiriman -->
+    <section class="card alamat-card">
+      <h2 class="profil-title">Alamat Pengiriman</h2>
+
+      <form id="form-alamat" class="alamat-form">
+        <input type="text" id="alamat-nama" placeholder="Nama penerima" required>
+        <input type="text" id="alamat-hp" placeholder="No. HP" required>
+        <textarea id="alamat-detail" placeholder="Alamat lengkap" required></textarea>
+        <div class="alamat-row">
+          <input type="text" id="alamat-kota" placeholder="Kota" required>
+          <input type="text" id="alamat-kodepos" placeholder="Kode pos" required>
+        </div>
+        <button type="submit" class="profil-btn">Simpan Alamat</button>
+      </form>
+
+      <div id="alamat-list" class="alamat-list">
+        <!-- daftar alamat dirender dari app.js -->
       </div>
     </section>
   </main>

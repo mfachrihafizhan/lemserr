@@ -6,12 +6,14 @@
   <title>Keranjang Belanja</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <!-- Customer Service -->
 <div id="cs-popup" class="cs-popup">
   <a href="https://wa.me/6282112291916" target="_blank" class="cs-popup-btn">
-🟢CS
+    🟢CS
   </a>
 </div>
+
 <body>
   <!-- Hamburger -->
   <div id="sidebarToggle" class="sidebar-hamburger">
@@ -20,36 +22,65 @@
       <rect y="19" width="32" height="5" rx="2.2" fill="#454545"/>
       <rect y="29" width="32" height="5" rx="2.2" fill="#454545"/>
     </svg>
-  </div>  <!-- Sidebar -->
+  </div>
+
+  <!-- Sidebar -->
   <aside id="sidebar" class="sidebar">
-    <div class="sidebar-pen">
-    </div>
+    <div class="sidebar-pen"></div>
     <nav class="sidebar-menu">
-      <a href="index.html" class="sidebar-link"><span class="sidebar-icon">🏠</span><span class="sidebar-text">Profil</span></a>
-      <a href="tentang.html" class="sidebar-link"><span class="sidebar-icon">ℹ️</span><span class="sidebar-text">Tentang</span></a>
-      <a href="produk.html" class="sidebar-link"><span class="sidebar-icon">🛒</span><span class="sidebar-text">Produk</span></a>
-      <a href="order.html" class="sidebar-link"><span class="sidebar-icon">📝</span><span class="sidebar-text">Order</span></a>
+      <a href="index.html" class="sidebar-link">
+        <span class="sidebar-icon">🏠</span><span class="sidebar-text">Profil</span>
+      </a>
+      <a href="tentang.html" class="sidebar-link">
+        <span class="sidebar-icon">ℹ️</span><span class="sidebar-text">Tentang</span>
+      </a>
+      <a href="produk.html" class="sidebar-link">
+        <span class="sidebar-icon">🛒</span><span class="sidebar-text">Produk</span>
+      </a>
+      <a href="order.html" class="sidebar-link">
+        <span class="sidebar-icon">📝</span><span class="sidebar-text">Order</span>
+      </a>
+      <a href="ulasan.html" class="sidebar-link">
+        <span class="sidebar-icon">⭐</span><span class="sidebar-text">Ulasan</span>
+      </a>
+
+      <a href="auth.html" id="btn-login-open" class="sidebar-link">
+        <span class="sidebar-icon">🔑</span><span class="sidebar-text">Login</span>
+      </a>
+      <a href="#" id="btn-logout" class="sidebar-link" style="display:none;">
+        <span class="sidebar-icon">🚪</span><span class="sidebar-text">Logout</span>
+      </a>
+      <a href="profil.html" id="btn-profil" class="sidebar-link" style="display:none;">
+        <span class="sidebar-icon">👤</span><span class="sidebar-text">Profil</span>
+      </a>
     </nav>
   </aside>
+
   <main class="order-main">
     <div class="order-title">Keranjang Belanja</div>
+
     <div class="order-table-header">
       <span style="width:70px"></span>
       <span style="flex:2;">Produk</span>
       <span class="harga">Harga Satuan</span>
       <span class="qty">Kuantitas</span>
+      <span style="width:90px;">Aksi</span>
     </div>
+
     <div id="orderRows"></div>
+
     <div class="order-footer">
       <div class="order-footer-left">
         <label><input type="checkbox" id="selectAll" /> Pilih Semua</label>
       </div>
       <div class="order-footer-total">
-        Total (<span class="total-pesanan">0 Pesanan</span>) : <b>Rp. <span id="totalHarga">0</span></b>
+        Total (<span class="total-pesanan">0 Pesanan</span>) :
+        <b>Rp. <span id="totalHarga">0</span></b>
       </div>
       <button class="order-footer-btn" id="orderBtn" disabled>Pesan Sekarang</button>
     </div>
   </main>
+
   <script>
     // --- SIDEBAR ---
     const sidebar = document.getElementById("sidebar");
@@ -66,50 +97,141 @@
       }
     });
 
-    // --- ORDER LOGIC ---
+    // --- ORDER LOGIC (KERANJANG) ---
     const PRODUK = [
-      {id:"large",nama:"Lemon Sereh - Cup Large",harga:12000,desc:"Minuman segar beraroma lemon dan sereh."},
-      {id:"medium",nama:"Lemon Sereh - Cup Medium",harga:8000,desc:"Porsi medium, rasa tetap segar."},
-      {id:"small",nama:"Lemon Sereh - Cup Small",harga:6000,desc:"Porsi kecil praktis untuk dinikmati."},
+      {id:"large", nama:"Lemon Sereh - Cup Large", harga:12000, desc:"Minuman segar beraroma lemon dan sereh."},
+      {id:"medium", nama:"Lemon Sereh - Cup Medium", harga:8000, desc:"Porsi medium, rasa tetap segar."},
+      {id:"small", nama:"Lemon Sereh - Cup Small", harga:6000, desc:"Porsi kecil praktis untuk dinikmati."},
     ];
-    const state={}; PRODUK.forEach(p=>{state[p.id]={checked:false,qty:0};});
-    function renderRows(){const el=document.getElementById("orderRows");el.innerHTML="";PRODUK.forEach(p=>{const st=state[p.id];el.innerHTML+=`
-    <div class="order-row" id="row-${p.id}">
-      <input class="order-checkbox" type="checkbox" ${st.checked?"checked":""} onchange="onCheck('${p.id}',this.checked)">
-      <div class="order-info">
-        <div class="order-name">${p.nama}</div>
-        <div class="order-desc">${p.desc}</div>
-      </div>
-      <div class="order-harga">Rp. ${p.harga.toLocaleString()}</div>
-      <div class="order-qty">
-        <button class="order-qty-btn" onclick="minusQty('${p.id}')">-</button>
-        <span class="order-qty-val">${st.qty}</span>
-        <button class="order-qty-btn" onclick="plusQty('${p.id}')">+</button>
-      </div>
-    </div>`;});updateFooter();}
-    function onCheck(id,val){state[id].checked=val;renderRows();}
-    function minusQty(id){if(state[id].qty>0)state[id].qty--;renderRows();}
-    function plusQty(id){state[id].qty++;state[id].checked=true;renderRows();}
-    function updateFooter(){document.getElementById("selectAll").checked=PRODUK.every(p=>state[p.id].checked);let totalHarga=0,totalQty=0;PRODUK.forEach(p=>{if(state[p.id].checked&&state[p.id].qty>0){totalHarga+=p.harga*state[p.id].qty;totalQty+=state[p.id].qty;}});document.getElementById("totalHarga").innerText=totalHarga.toLocaleString();document.querySelector(".total-pesanan").innerText=totalQty+" Pesanan";document.getElementById("orderBtn").disabled=(totalQty===0);}
-    document.getElementById("selectAll").onchange=function(){PRODUK.forEach(p=>state[p.id].checked=this.checked);renderRows();};
-    document.getElementById("orderBtn").onclick = function() {
-      // data pesanan & total
-      let pesan = "Halo, saya ingin memesan:\n";
-      let totalHarga = 0, totalQty = 0;
+
+    const state = {};
+    PRODUK.forEach(p => {
+      state[p.id] = {checked:false, qty:0};
+    });
+
+    function renderRows() {
+      const el = document.getElementById("orderRows");
+      el.innerHTML = "";
+      PRODUK.forEach(p => {
+        const st = state[p.id];
+        el.innerHTML += `
+          <div class="order-row" id="row-${p.id}">
+            <input class="order-checkbox" type="checkbox"
+              ${st.checked ? "checked" : ""}
+              onchange="onCheck('${p.id}', this.checked)">
+            <div class="order-info">
+              <div class="order-name">${p.nama}</div>
+              <div class="order-desc">${p.desc}</div>
+            </div>
+            <div class="order-harga">Rp. ${p.harga.toLocaleString()}</div>
+            <div class="order-qty">
+              <button class="order-qty-btn" onclick="minusQty('${p.id}')">-</button>
+              <span class="order-qty-val">${st.qty}</span>
+              <button class="order-qty-btn" onclick="plusQty('${p.id}')">+</button>
+            </div>
+            <div style="width:90px; text-align:center;">
+              <button class="order-qty-btn" onclick="clearItem('${p.id}')">✕</button>
+            </div>
+          </div>`;
+      });
+      updateFooter();
+    }
+
+    function onCheck(id, val) {
+      state[id].checked = val;
+      updateFooter();
+    }
+
+    function minusQty(id) {
+      if (state[id].qty > 0) state[id].qty--;
+      if (state[id].qty === 0) state[id].checked = false;
+      renderRows();
+    }
+
+    function plusQty(id) {
+      state[id].qty++;
+      state[id].checked = true;
+      renderRows();
+    }
+
+    function clearItem(id) {
+      state[id].qty = 0;
+      state[id].checked = false;
+      renderRows();
+    }
+
+    function updateFooter() {
+      const selectAll = document.getElementById("selectAll");
+      selectAll.checked = PRODUK.every(p => state[p.id].checked);
+
+      let totalHarga = 0;
+      let totalQty = 0;
       PRODUK.forEach(p => {
         const s = state[p.id];
         if (s.checked && s.qty > 0) {
-          pesan += `- ${p.nama} x ${s.qty} = Rp. ${ (p.harga*s.qty).toLocaleString() }\n`;
           totalHarga += p.harga * s.qty;
           totalQty += s.qty;
         }
       });
-      pesan += `Total (${totalQty} pesanan): Rp. ${totalHarga.toLocaleString()}`;
+
+      document.getElementById("totalHarga").innerText = totalHarga.toLocaleString();
+      document.querySelector(".total-pesanan").innerText = totalQty + " Pesanan";
+      document.getElementById("orderBtn").disabled = (totalQty === 0);
+    }
+
+    document.getElementById("selectAll").onchange = function() {
+      PRODUK.forEach(p => state[p.id].checked = this.checked && state[p.id].qty > 0);
+      renderRows();
+    };
+
+    document.getElementById("orderBtn").onclick = function() {
+      let pesan = "Halo, saya ingin memesan:\n";
+      let totalHarga = 0, totalQty = 0;
+
+      PRODUK.forEach(p => {
+        const s = state[p.id];
+        if (s.checked && s.qty > 0) {
+          const subTotal = p.harga * s.qty;
+          pesan += `- ${p.nama} x ${s.qty} = Rp. ${subTotal.toLocaleString()}\n`;
+          totalHarga += subTotal;
+          totalQty += s.qty;
+
+          // simpan ke daftar order (localStorage) via app.js
+          if (typeof addOrder === 'function') {
+            addOrder(p.nama, s.qty, subTotal);
+          }
+        }
+      });
+
+      if (totalQty === 0) return;
+
+      pesan += `\nTotal (${totalQty} pesanan): Rp. ${totalHarga.toLocaleString()}\n`;
+
+      // tambahkan data alamat dari profil (app.js: getPrimaryAddress)
+      if (typeof getPrimaryAddress === 'function') {
+        const addr = getPrimaryAddress();
+        if (addr) {
+          pesan += `\nData Pengiriman:\n`;
+          pesan += `Nama: ${addr.nama}\n`;
+          pesan += `HP: ${addr.hp}\n`;
+          pesan += `Alamat: ${addr.detail}, ${addr.kota}, ${addr.kodepos}\n`;
+        } else {
+          pesan += `\n(Data alamat belum diisi di profil)\n`;
+        }
+      }
+
       const waNumber = "6282112291916";
       const waURL = `https://wa.me/${waNumber}?text=${encodeURIComponent(pesan)}`;
-      window.location.href = waURL;
+      window.open(waURL, "_blank");
     };
-    renderRows();window.onCheck=onCheck;window.minusQty=minusQty;window.plusQty=plusQty;
+
+    renderRows();
+    window.onCheck = onCheck;
+    window.minusQty = minusQty;
+    window.plusQty = plusQty;
+    window.clearItem = clearItem;
   </script>
+
+  <script src="app.js"></script>
 </body>
 </html>
