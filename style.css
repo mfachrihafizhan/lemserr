@@ -880,3 +880,34 @@ main { margin-left: 120px; padding: 38px 15px; }
     align-items: stretch;
   }
 }
+
+.order-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 80px;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: #fff7e6;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.order-qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #d0a85c;
+  background: #fff;
+  color: #705900;
+  cursor: pointer;
+}
+
+.order-delete-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #ffdddd;
+  color: #b30000;
+  cursor: pointer;
+  font-size: 12px;
+}
