@@ -108,11 +108,12 @@
   </div>
 
   <!-- SATU TOMBOL UNTUK SEMUA -->
-  <div style="margin-top:16px; text-align:right;">
-    <button type="button" id="btn-add-all" class="btn-add-cart">
-      Masuk Keranjang
-    </button>
-  </div>
+  <div class="produk-footer">
+  <button type="button" id="btn-add-all" class="btn-cart-main">
+    Masuk Keranjang
+  </button>
+</div>
+
 </section>
 
 
@@ -138,75 +139,72 @@
   </script>
 
   <!-- LOGIC AUTH + ORDER (LOCALSTORAGE) -->
-  <script src="app.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      // update tombol login/logout/profil
-      if (typeof updateAuthUI === "function") {
-        updateAuthUI();
-      }
+<script src="app.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (typeof updateAuthUI === "function") {
+      updateAuthUI();
+    }
 
-      // kalau mau tampilkan list pesanan di bawah
-      if (typeof renderOrderList === "function") {
-        renderOrderList();
-      }
+    const cards = document.querySelectorAll(".produk-card");
 
-      const cards = document.querySelectorAll(".produk-card");
+    // handle plus/minus per card
+    cards.forEach(card => {
+      const minusBtn = card.querySelector(".btn-qty-minus");
+      const plusBtn = card.querySelector(".btn-qty-plus");
+      const qtySpan = card.querySelector(".produk-qty-val");
 
-      cards.forEach(card => {
-        const minusBtn = card.querySelector(".btn-qty-minus");
-        const plusBtn = card.querySelector(".btn-qty-plus");
-        const qtySpan = card.querySelector(".produk-qty-val");
-        const addBtn = card.querySelector(".btn-add-cart");
+      minusBtn.addEventListener("click", () => {
+        let qty = Number(qtySpan.textContent) || 0;
+        if (qty > 0) qty--;
+        qtySpan.textContent = qty;
+      });
 
-        const nama = card.dataset.nama;
-        const harga = Number(card.dataset.harga);
-
-        // tombol -
-        minusBtn.addEventListener("click", () => {
-          let qty = Number(qtySpan.textContent) || 0;
-          if (qty > 0) qty--;
-          qtySpan.textContent = qty;
-        });
-
-        // tombol +
-        plusBtn.addEventListener("click", () => {
-          let qty = Number(qtySpan.textContent) || 0;
-          qty++;
-          qtySpan.textContent = qty;
-        });
-
-        // tombol Masuk Keranjang
-        addBtn.addEventListener("click", () => {
-          const qty = Number(qtySpan.textContent) || 0;
-          if (qty <= 0) {
-            alert("Jumlah pesanan belum diatur.");
-            return;
-          }
-
-          const currentUser =
-            typeof getCurrentUser === "function" ? getCurrentUser() : null;
-          if (!currentUser) {
-            alert("Silakan login terlebih dahulu sebelum memesan.");
-            window.location.href = "auth.html";
-            return;
-          }
-
-          // pakai addOrder dari app.js biar format data konsisten
-          if (typeof addOrder === "function") {
-            const total = harga * qty;
-            addOrder(nama, qty, total);
-          } else {
-            alert("Fungsi addOrder belum tersedia.");
-            return;
-          }
-
-          alert("Keranjang diperbarui. Silakan cek di halaman Order.");
-          // kalau mau langsung pindah:
-          // window.location.href = "order.html";
-        });
+      plusBtn.addEventListener("click", () => {
+        let qty = Number(qtySpan.textContent) || 0;
+        qty++;
+        qtySpan.textContent = qty;
       });
     });
-  </script>
+
+    // tombol Masuk Keranjang tunggal
+    const btnAddAll = document.getElementById("btn-add-all");
+    btnAddAll.addEventListener("click", () => {
+      const currentUser =
+        typeof getCurrentUser === "function" ? getCurrentUser() : null;
+      if (!currentUser) {
+        alert("Silakan login terlebih dahulu sebelum memesan.");
+        window.location.href = "auth.html";
+        return;
+      }
+
+      let adaYangDipilih = false;
+
+      cards.forEach(card => {
+        const nama = card.dataset.nama;
+        const harga = Number(card.dataset.harga);
+        const qtySpan = card.querySelector(".produk-qty-val");
+        const qty = Number(qtySpan.textContent) || 0;
+
+        if (qty > 0) {
+          adaYangDipilih = true;
+          const total = harga * qty;
+          if (typeof addOrder === "function") {
+            addOrder(nama, qty, total);
+          }
+        }
+      });
+
+      if (!adaYangDipilih) {
+        alert("Belum ada jumlah pesanan yang diatur.");
+        return;
+      }
+
+      alert("Keranjang diperbarui. Silakan cek di halaman Order.");
+      // kalau mau langsung ke keranjang:
+      window.location.href = "order.html";
+    });
+  });
+</script>
 </body>
 </html>
