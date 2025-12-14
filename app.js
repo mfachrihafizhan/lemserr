@@ -265,8 +265,10 @@ function getPrimaryAddress() {
   return u.addresses[0];
 }
 
-// ====== REVIEW / ULASAN (dipersingkat, pakai punyamu yang lama) ======
 // ====== REVIEW / ULASAN ======
+// ====== REVIEW / ULASAN ======
+let currentEditingReviewId = null;
+
 async function addReview(produkId, rating, text) {
   const currentUser = getCurrentUser();
   if (!currentUser) {
@@ -278,10 +280,19 @@ async function addReview(produkId, rating, text) {
     return;
   }
 
+  // kalau sedang mode edit, jangan insert baru tapi update
+  if (currentEditingReviewId) {
+    await updateReview(currentEditingReviewId, produkId, rating, text);
+    currentEditingReviewId = null;
+    renderAllReviewsCurrentFilter();
+    return;
+  }
+
   const { error } = await supabaseClient
     .from('reviews')
     .insert({
       produkId,
+      userId: currentUser.id,      // pastikan kolom ini ada di tabel
       userName: currentUser.nama,
       rating: Number(rating),
       text
@@ -294,6 +305,52 @@ async function addReview(produkId, rating, text) {
   }
 
   alert('Ulasan tersimpan.');
+  renderAllReviewsCurrentFilter();
+}
+
+async function updateReview(id, produkId, rating, text) {
+  const currentUser = getCurrentUser();
+  if (!currentUser) return;
+  if (!window.supabaseClient) return;
+
+  const { error } = await supabaseClient
+    .from('reviews')
+    .update({
+      produkId,
+      rating: Number(rating),
+      text
+    })
+    .eq('id', id)
+    .eq('userId', currentUser.id);   // supaya cuma bisa edit punyanya sendiri
+
+  if (error) {
+    console.error(error);
+    alert('Gagal mengubah ulasan.');
+  } else {
+    alert('Ulasan berhasil diubah.');
+  }
+}
+
+async function deleteReview(id) {
+  const currentUser = getCurrentUser();
+  if (!currentUser) return;
+  if (!window.supabaseClient) return;
+
+  if (!confirm('Hapus ulasan ini?')) return;
+
+  const { error } = await supabaseClient
+    .from('reviews')
+    .delete()
+    .eq('id', id)
+    .eq('userId', currentUser.id);
+
+  if (error) {
+    console.error(error);
+    alert('Gagal menghapus ulasan.');
+    return;
+  }
+
+  alert('Ulasan dihapus.');
   renderAllReviewsCurrentFilter();
 }
 
@@ -322,6 +379,7 @@ async function renderAllReviews(filterProdukId) {
     return;
   }
 
+  // hitung summary
   const counts = {1:0,2:0,3:0,4:0,5:0};
   reviews.forEach(r => {
     if (counts[r.rating] != null) counts[r.rating] += 1;
@@ -358,6 +416,7 @@ async function renderAllReviews(filterProdukId) {
     }
   }
 
+  const currentUser = getCurrentUser();
   const produkNames = {
     large: 'Lemon Sereh - Cup Large',
     medium: 'Lemon Sereh - Cup Medium',
@@ -373,8 +432,12 @@ async function renderAllReviews(filterProdukId) {
   reviews.forEach(r => {
     const namaProduk = produkNames[r.produkId] || r.produkId;
     const stars = '⭐'.repeat(r.rating);
+    const isOwner = currentUser && r.userId === currentUser.id;
+
     html += `
-      <div class="ulasan-item">
+      <div class="ulasan-item" data-review-id="${r.id}"
+           data-produk-id="${r.produkId}" data-rating="${r.rating}"
+           data-text="${r.text.replace(/"/g, '&quot;')}">
         <div class="ulasan-item-header">
           <div>
             <div class="ulasan-item-nama">${r.userName}</div>
@@ -383,11 +446,48 @@ async function renderAllReviews(filterProdukId) {
           <div class="ulasan-item-rating">${stars} (${r.rating}/5)</div>
         </div>
         <p class="ulasan-item-text">${r.text}</p>
+        ${isOwner ? `
+          <div class="ulasan-actions">
+            <button type="button" class="btn-ulasan-edit">Edit</button>
+            <button type="button" class="btn-ulasan-delete">Hapus</button>
+          </div>
+        ` : ''}
       </div>
     `;
   });
 
   container.innerHTML = html;
+
+  // event edit & hapus
+  container.querySelectorAll('.btn-ulasan-edit').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.ulasan-item');
+      const id = item.dataset.reviewId;
+      const produkId = item.dataset.produkId;
+      const rating = item.dataset.rating;
+      const text = item.dataset.text;
+
+      // isi form global
+      const selectProduk = document.getElementById('ulasan-produk');
+      const selectRating = document.getElementById('ulasan-rating');
+      const textarea = document.getElementById('ulasan-text');
+      if (selectProduk) selectProduk.value = produkId;
+      if (selectRating) selectRating.value = rating;
+      if (textarea) textarea.value = text;
+
+      currentEditingReviewId = id;
+      const btnSubmit = document.querySelector('#form-ulasan-global button[type="submit"]');
+      if (btnSubmit) btnSubmit.textContent = 'Update Ulasan';
+    });
+  });
+
+  container.querySelectorAll('.btn-ulasan-delete').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.ulasan-item');
+      const id = item.dataset.reviewId;
+      deleteReview(id);
+    });
+  });
 }
 
 function renderAllReviewsCurrentFilter() {

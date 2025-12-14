@@ -143,7 +143,7 @@
 
     <!-- LIST ULASAN -->
     <div id="ulasan-list" class="ulasan-list">
-      <!-- diisi dari app.js -->
+      <!-- diisi dari app.js: ada tombol Edit / Hapus untuk ulasan milik user sendiri -->
     </div>
   </main>
 
@@ -178,12 +178,14 @@
           if (!produkId || !rating || !text.trim()) return;
 
           if (typeof addReview === 'function') {
-            addReview(produkId, rating, text);
+            addReview(produkId, rating, text); // handle create & edit di app.js
           } else {
             alert('Fungsi ulasan belum tersedia.');
           }
 
           form.reset();
+          const btnSubmit = form.querySelector('button[type="submit"]');
+          if (btnSubmit) btnSubmit.textContent = 'Kirim Ulasan';
         });
       }
 
