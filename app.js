@@ -266,7 +266,6 @@ function getPrimaryAddress() {
 }
 
 // ====== REVIEW / ULASAN ======
-// ====== REVIEW / ULASAN ======
 let currentEditingReviewId = null;
 
 async function addReview(produkId, rating, text) {
