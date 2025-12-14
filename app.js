@@ -605,30 +605,53 @@ document.addEventListener('DOMContentLoaded', () => {
     btnHapusAkun.addEventListener('click', deleteAccount);
   }
 
-  const formAlamat = document.getElementById('form-alamat');
-  if (formAlamat) {
-    formAlamat.addEventListener('submit', e => {
-      e.preventDefault();
-      const data = {
-        nama: document.getElementById('alamat-nama').value,
-        hp: document.getElementById('alamat-hp').value,
-        detail: document.getElementById('alamat-detail').value,
-        kota: document.getElementById('alamat-kota').value,
-        kodepos: document.getElementById('alamat-kodepos').value
-      };
-      const container = document.getElementById('alamat-list');
-      const editId = container.dataset.editId;
-      if (editId) {
-        updateAddress(Number(editId), data);
-        delete container.dataset.editId;
-      } else {
-        addAddress(data);
-      }
-      formAlamat.reset();
-      renderAddressList();
-    });
+const formAlamat = document.getElementById('form-alamat');
+if (formAlamat) {
+  formAlamat.addEventListener('submit', e => {
+    e.preventDefault();
+
+    const nama = document.getElementById('alamat-nama').value;
+    const hpStr = document.getElementById('alamat-hp').value;
+    const detail = document.getElementById('alamat-detail').value;
+    const kota = document.getElementById('alamat-kota').value;
+    const kodeposStr = document.getElementById('alamat-kodepos').value;
+
+    const hp = Number(hpStr);
+    const kodepos = Number(kodeposStr);
+
+    if (!Number.isInteger(hp) || hp <= 0) {
+      alert('No. HP harus berupa angka.');
+      return;
+    }
+    if (!Number.isInteger(kodepos) || kodepos <= 0) {
+      alert('Kode pos harus berupa angka.');
+      return;
+    }
+
+    const data = {
+      nama,
+      hp,        // integer
+      detail,
+      kota,
+      kodepos    // integer
+    };
+
+    const container = document.getElementById('alamat-list');
+    const editId = container.dataset.editId;
+
+    if (editId) {
+      updateAddress(Number(editId), data);
+      delete container.dataset.editId;
+    } else {
+      addAddress(data);
+    }
+
+    formAlamat.reset();
     renderAddressList();
-  }
+  });
+
+  renderAddressList();
+}
 
   // inisialisasi ulasan, dsb (kalau ada) ...
 
