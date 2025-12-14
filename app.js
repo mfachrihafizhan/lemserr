@@ -266,7 +266,136 @@ function getPrimaryAddress() {
 }
 
 // ====== REVIEW / ULASAN (dipersingkat, pakai punyamu yang lama) ======
-// ... (bagian supabase ulasan tetap pakai versi kamu sendiri) ...
+// ====== REVIEW / ULASAN ======
+async function addReview(produkId, rating, text) {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    alert('Harus login untuk mengirim ulasan.');
+    return;
+  }
+  if (!window.supabaseClient) {
+    alert('Supabase belum siap.');
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from('reviews')
+    .insert({
+      produkId,
+      userName: currentUser.nama,
+      rating: Number(rating),
+      text
+    });
+
+  if (error) {
+    console.error(error);
+    alert('Gagal menyimpan ulasan.');
+    return;
+  }
+
+  alert('Ulasan tersimpan.');
+  renderAllReviewsCurrentFilter();
+}
+
+async function renderAllReviews(filterProdukId) {
+  const container = document.getElementById('ulasan-list');
+  if (!container) return;
+
+  if (!window.supabaseClient) {
+    container.innerHTML = '<p>Supabase belum siap.</p>';
+    return;
+  }
+
+  let query = supabaseClient
+    .from('reviews')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (filterProdukId && filterProdukId !== 'all') {
+    query = query.eq('produkId', filterProdukId);
+  }
+
+  const { data: reviews, error } = await query;
+  if (error) {
+    console.error(error);
+    container.innerHTML = '<p>Gagal memuat ulasan.</p>';
+    return;
+  }
+
+  const counts = {1:0,2:0,3:0,4:0,5:0};
+  reviews.forEach(r => {
+    if (counts[r.rating] != null) counts[r.rating] += 1;
+  });
+
+  const total = reviews.length;
+  let sum = 0;
+  Object.keys(counts).forEach(k => {
+    sum += Number(k) * counts[k];
+  });
+  const avg = total ? (sum / total) : 0;
+
+  const totalEl = document.getElementById('total-reviews');
+  const avgEl = document.getElementById('avg-rating');
+  const starsEl = document.getElementById('avg-stars');
+
+  if (totalEl) totalEl.textContent = total + ' reviews';
+  if (avgEl) avgEl.textContent = avg.toFixed(1);
+  if (starsEl) {
+    const rounded = Math.round(avg);
+    const filled = '★'.repeat(rounded || 0);
+    const empty = '☆'.repeat(5 - (rounded || 0));
+    starsEl.textContent = filled + empty;
+  }
+
+  for (let i = 1; i <= 5; i++) {
+    const countSpan = document.getElementById('count-' + i);
+    const barFill = document.getElementById('bar-' + i);
+    const c = counts[i] || 0;
+    if (countSpan) countSpan.textContent = c;
+    if (barFill) {
+      const percent = total ? (c / total) * 100 : 0;
+      barFill.style.width = percent + '%';
+    }
+  }
+
+  const produkNames = {
+    large: 'Lemon Sereh - Cup Large',
+    medium: 'Lemon Sereh - Cup Medium',
+    small: 'Lemon Sereh - Cup Small'
+  };
+
+  if (!reviews.length) {
+    container.innerHTML = '<p>Belum ada ulasan.</p>';
+    return;
+  }
+
+  let html = '';
+  reviews.forEach(r => {
+    const namaProduk = produkNames[r.produkId] || r.produkId;
+    const stars = '⭐'.repeat(r.rating);
+    html += `
+      <div class="ulasan-item">
+        <div class="ulasan-item-header">
+          <div>
+            <div class="ulasan-item-nama">${r.userName}</div>
+            <div class="ulasan-item-produk">${namaProduk}</div>
+          </div>
+          <div class="ulasan-item-rating">${stars} (${r.rating}/5)</div>
+        </div>
+        <p class="ulasan-item-text">${r.text}</p>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function renderAllReviewsCurrentFilter() {
+  const filterSelect = document.getElementById('filterProduk');
+  if (filterSelect) {
+    renderAllReviews(filterSelect.value);
+  }
+}
 
 // ====== ORDER: SIMPAN LIST DI LOCALSTORAGE ======
 function getUserOrders() {

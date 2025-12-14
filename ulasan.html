@@ -18,9 +18,9 @@
   <!-- Hamburger -->
   <div id="sidebarToggle" class="sidebar-hamburger">
     <svg width="40" height="40" viewBox="0 0 40 40">
-      <rect y="9" width="32" height="5" rx="2.2" fill="#454545"/>
-      <rect y="19" width="32" height="5" rx="2.2" fill="#454545"/>
-      <rect y="29" width="32" height="5" rx="2.2" fill="#454545"/>
+      <rect y="9" width="32" height="5" rx="2.2" fill="#454545"></rect>
+      <rect y="19" width="32" height="5" rx="2.2" fill="#454545"></rect>
+      <rect y="29" width="32" height="5" rx="2.2" fill="#454545"></rect>
     </svg>
   </div>
 
@@ -65,27 +65,37 @@
 
         <div class="ulasan-bar-row">
           <span>5★</span>
-          <div class="ulasan-bar"><div class="ulasan-bar-fill" id="bar-5"></div></div>
+          <div class="ulasan-bar">
+            <div class="ulasan-bar-fill" id="bar-5"></div>
+          </div>
           <span id="count-5">0</span>
         </div>
         <div class="ulasan-bar-row">
           <span>4★</span>
-          <div class="ulasan-bar"><div class="ulasan-bar-fill" id="bar-4"></div></div>
+          <div class="ulasan-bar">
+            <div class="ulasan-bar-fill" id="bar-4"></div>
+          </div>
           <span id="count-4">0</span>
         </div>
         <div class="ulasan-bar-row">
           <span>3★</span>
-          <div class="ulasan-bar"><div class="ulasan-bar-fill" id="bar-3"></div></div>
+          <div class="ulasan-bar">
+            <div class="ulasan-bar-fill" id="bar-3"></div>
+          </div>
           <span id="count-3">0</span>
         </div>
         <div class="ulasan-bar-row">
           <span>2★</span>
-          <div class="ulasan-bar"><div class="ulasan-bar-fill" id="bar-2"></div></div>
+          <div class="ulasan-bar">
+            <div class="ulasan-bar-fill" id="bar-2"></div>
+          </div>
           <span id="count-2">0</span>
         </div>
         <div class="ulasan-bar-row">
           <span>1★</span>
-          <div class="ulasan-bar"><div class="ulasan-bar-fill" id="bar-1"></div></div>
+          <div class="ulasan-bar">
+            <div class="ulasan-bar-fill" id="bar-1"></div>
+          </div>
           <span id="count-1">0</span>
         </div>
       </div>
@@ -137,6 +147,7 @@
     </div>
   </main>
 
+  <!-- SIDEBAR & FORM ULASAN -->
   <script>
     // SIDEBAR
     const sidebar = document.getElementById("sidebar");
@@ -146,46 +157,57 @@
       e.stopPropagation();
     };
     document.addEventListener("click", function(e) {
-      if(window.innerWidth <= 600 &&
-         !sidebar.contains(e.target) &&
-         !toggleBtn.contains(e.target)) {
+      if (
+        window.innerWidth <= 600 &&
+        !sidebar.contains(e.target) &&
+        !toggleBtn.contains(e.target)
+      ) {
         sidebar.classList.remove("active");
       }
     });
 
-    // FORM ULASAN GLOBAL: pakai fungsi addReview di app.js
+    // FORM ULASAN GLOBAL + FILTER
     document.addEventListener('DOMContentLoaded', () => {
       const form = document.getElementById('form-ulasan-global');
-      if (!form) return;
+      if (form) {
+        form.addEventListener('submit', e => {
+          e.preventDefault();
+          const produkId = document.getElementById('ulasan-produk').value;
+          const rating = document.getElementById('ulasan-rating').value;
+          const text = document.getElementById('ulasan-text').value;
+          if (!produkId || !rating || !text.trim()) return;
 
-      form.addEventListener('submit', e => {
-        e.preventDefault();
-        const produkId = document.getElementById('ulasan-produk').value;
-        const rating = document.getElementById('ulasan-rating').value;
-        const text = document.getElementById('ulasan-text').value;
-        if (!produkId || !rating || !text.trim()) return;
+          if (typeof addReview === 'function') {
+            addReview(produkId, rating, text);
+          } else {
+            alert('Fungsi ulasan belum tersedia.');
+          }
 
-        // pakai addReview milik app.js
-        if (typeof addReview === 'function') {
-          addReview(produkId, rating, text);
-        } else {
-          alert('Fungsi ulasan belum tersedia.');
-        }
+          form.reset();
+        });
+      }
 
-        form.reset();
-      });
+      const filterSelect = document.getElementById('filterProduk');
+      if (filterSelect && typeof renderAllReviews === 'function') {
+        filterSelect.addEventListener('change', () => {
+          renderAllReviews(filterSelect.value);
+        });
+        // render awal
+        renderAllReviews('all');
+      }
     });
   </script>
 
+  <!-- SUPABASE CLIENT -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://wqetnnxwslqofwemrlzi.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxZXRubnh3c2xxb2Z3ZW1ybHppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxMTU3MTksImV4cCI6MjA4MDY5MTcxOX0.sbMU0dJUXR7EZbxcdm9BFay8UTw2FnAQVelJyTLDIRk';
+    const { createClient } = supabase;
+    window.supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
 
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script>
-  const SUPABASE_URL = 'https://wqetnnxwslqofwemrlzi.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxZXRubnh3c2xxb2Z3ZW1ybHppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxMTU3MTksImV4cCI6MjA4MDY5MTcxOX0.sbMU0dJUXR7EZbxcdm9BFay8UTw2FnAQVelJyTLDIRk';
-  const { createClient } = supabase;
-  window.supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-</script>
-<script src="app.js"></script>
-
+  <!-- APP JS (addReview, renderAllReviews, auth, dll.) -->
+  <script src="app.js"></script>
 </body>
 </html>
