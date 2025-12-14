@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Produk - Lemon Sereh</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <!-- Customer Service -->
 <div id="cs-popup" class="cs-popup">
   <a href="https://wa.me/6282112291916" target="_blank" class="cs-popup-btn">
-    🟢CS
+    CS
   </a>
 </div>
 
@@ -18,9 +18,9 @@
   <!-- Tombol Hamburger -->
   <div id="sidebarToggle" class="sidebar-hamburger">
     <svg width="40" height="40" viewBox="0 0 40 40">
-      <rect y="9" width="32" height="5" rx="2.2" fill="#454545"/>
-      <rect y="19" width="32" height="5" rx="2.2" fill="#454545"/>
-      <rect y="29" width="32" height="5" rx="2.2" fill="#454545"/>
+      <rect y="9" width="32" height="5" rx="2.2" fill="#454545"></rect>
+      <rect y="19" width="32" height="5" rx="2.2" fill="#454545"></rect>
+      <rect y="29" width="32" height="5" rx="2.2" fill="#454545"></rect>
     </svg>
   </div>
 
@@ -29,113 +29,201 @@
     <div class="sidebar-pen"></div>
     <nav class="sidebar-menu">
       <a href="index.html" class="sidebar-link">
-        <span class="sidebar-icon">🏠</span><span class="sidebar-text">Profil</span>
+        <span class="sidebar-icon"></span>
+        <span class="sidebar-text">Profil</span>
       </a>
       <a href="tentang.html" class="sidebar-link">
-        <span class="sidebar-icon">ℹ️</span><span class="sidebar-text">Tentang</span>
+        <span class="sidebar-icon"></span>
+        <span class="sidebar-text">Tentang</span>
       </a>
       <a href="produk.html" class="sidebar-link">
-        <span class="sidebar-icon">🛒</span><span class="sidebar-text">Produk</span>
+        <span class="sidebar-icon"></span>
+        <span class="sidebar-text">Produk</span>
       </a>
       <a href="order.html" class="sidebar-link">
-        <span class="sidebar-icon">📝</span><span class="sidebar-text">Order</span>
+        <span class="sidebar-icon"></span>
+        <span class="sidebar-text">Order</span>
       </a>
       <a href="ulasan.html" class="sidebar-link">
-        <span class="sidebar-icon">⭐</span><span class="sidebar-text">Ulasan</span>
+        <span class="sidebar-icon"></span>
+        <span class="sidebar-text">Ulasan</span>
       </a>
+
       <a href="auth.html" id="btn-login-open" class="sidebar-link">
-        <span class="sidebar-icon">🔑</span><span class="sidebar-text">Login</span>
+        <span class="sidebar-icon"></span>
+        <span class="sidebar-text">Login</span>
       </a>
-      <a href="#" id="btn-logout" class="sidebar-link" style="display:none;">
-        <span class="sidebar-icon">🚪</span><span class="sidebar-text">Logout</span>
+      <a href="#" id="btn-logout" class="sidebar-link" style="display: none">
+        <span class="sidebar-icon"></span>
+        <span class="sidebar-text">Logout</span>
       </a>
-      <a href="profil.html" id="btn-profil" class="sidebar-link" style="display:none;">
-        <span class="sidebar-icon">👤</span><span class="sidebar-text">Profil</span>
+      <a href="profil.html" id="btn-profil" class="sidebar-link" style="display: none">
+        <span class="sidebar-icon"></span>
+        <span class="sidebar-text">Profil</span>
       </a>
     </nav>
   </aside>
 
   <main>
     <section class="card produk-main">
-      <h2 style="color:#705900;">Produk Kami</h2>
+      <h2 style="color:#705900">Produk Kami</h2>
 
       <!-- PRODUK 1 -->
       <div class="produk">
-        <div class="produk-card">
+        <div class="produk-card"
+             data-produk-id="large"
+             data-nama="Lemon Sereh - Cup Large"
+             data-harga="12000">
           <h3>Lemon Sereh - Cup Large</h3>
           <p>Minuman segar beraroma lemon dan sereh.</p>
-          <button onclick="orderSingleProduct('Lemon Sereh - Cup Large', 12000)">
-            Order Sekarang
+          <div class="produk-qty-control">
+            <button type="button" class="btn-qty-minus">-</button>
+            <span class="produk-qty-val">0</span>
+            <button type="button" class="btn-qty-plus">+</button>
+          </div>
+          <button type="button" class="btn-add-cart">
+            Masuk Keranjang
           </button>
         </div>
       </div>
 
       <!-- PRODUK 2 -->
       <div class="produk">
-        <div class="produk-card">
+        <div class="produk-card"
+             data-produk-id="medium"
+             data-nama="Lemon Sereh - Cup Medium"
+             data-harga="8000">
           <h3>Lemon Sereh - Cup Medium</h3>
           <p>Porsi medium, rasa tetap segar.</p>
-          <button onclick="orderSingleProduct('Lemon Sereh - Cup Medium', 8000)">
-            Order Sekarang
+          <div class="produk-qty-control">
+            <button type="button" class="btn-qty-minus">-</button>
+            <span class="produk-qty-val">0</span>
+            <button type="button" class="btn-qty-plus">+</button>
+          </div>
+          <button type="button" class="btn-add-cart">
+            Masuk Keranjang
           </button>
         </div>
       </div>
 
       <!-- PRODUK 3 -->
       <div class="produk">
-        <div class="produk-card">
+        <div class="produk-card"
+             data-produk-id="small"
+             data-nama="Lemon Sereh - Cup Small"
+             data-harga="6000">
           <h3>Lemon Sereh - Cup Small</h3>
           <p>Porsi kecil praktis untuk dinikmati.</p>
-          <button onclick="orderSingleProduct('Lemon Sereh - Cup Small', 6000)">
-            Order Sekarang
+          <div class="produk-qty-control">
+            <button type="button" class="btn-qty-minus">-</button>
+            <span class="produk-qty-val">0</span>
+            <button type="button" class="btn-qty-plus">+</button>
+          </div>
+          <button type="button" class="btn-add-cart">
+            Masuk Keranjang
           </button>
         </div>
       </div>
     </section>
+
+    <!-- Opsional: list pesanan user di halaman produk -->
+    <section class="card">
+      <h2>Pesanan Saya</h2>
+      <div id="order-list"></div>
+    </section>
   </main>
 
-  <!-- SHOW/HIDE SIDEBAR -->
-<script>
-  const sidebar = document.getElementById("sidebar");
-  const toggleBtn = document.getElementById("sidebarToggle");
-  toggleBtn.onclick = function(e) {
-    sidebar.classList.toggle("active");
-    e.stopPropagation();
-  };
-  document.addEventListener("click", function(e) {
-    if (window.innerWidth <= 600 &&
+  <!-- SCRIPT SIDEBAR -->
+  <script>
+    const sidebar = document.getElementById("sidebar");
+    const toggleBtn = document.getElementById("sidebarToggle");
+
+    toggleBtn.onclick = function (e) {
+      sidebar.classList.toggle("active");
+      e.stopPropagation();
+    };
+
+    document.addEventListener("click", function (e) {
+      if (
+        window.innerWidth < 600 &&
         !sidebar.contains(e.target) &&
-        !toggleBtn.contains(e.target)) {
-      sidebar.classList.remove("active");
-    }
-  });
+        !toggleBtn.contains(e.target)
+      ) {
+        sidebar.classList.remove("active");
+      }
+    });
+  </script>
 
-  // fungsi order single product: simpan order lalu pindah ke halaman order
-  function orderSingleProduct(namaProduk, harga) {
-    const qtyStr = prompt('Masukkan jumlah pesanan untuk ' + namaProduk);
-    const qty = parseInt(qtyStr, 10);
-    if (!qty || qty <= 0) return;
-
-    const total = harga * qty;
-
-    // simpan ke daftar order (localStorage) via app.js
-    if (typeof addOrder === 'function') {
-      addOrder(namaProduk, qty, total);
-    } else {
-      alert('Fungsi addOrder belum tersedia.');
-      return;
-    }
-
-    alert('Pesanan disimpan. Kamu akan diarahkan ke halaman Order.');
-    window.location.href = 'order.html';
-  }
-</script>
-<main>
-  <section class="card">
-    <h2>Pesanan Saya</h2>
-    <div id="order-list"></div>
-  </section>
-</main>
+  <!-- LOGIC AUTH + ORDER (LOCALSTORAGE) -->
   <script src="app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // update tombol login/logout/profil
+      if (typeof updateAuthUI === "function") {
+        updateAuthUI();
+      }
+
+      // kalau mau tampilkan list pesanan di bawah
+      if (typeof renderOrderList === "function") {
+        renderOrderList();
+      }
+
+      const cards = document.querySelectorAll(".produk-card");
+
+      cards.forEach(card => {
+        const minusBtn = card.querySelector(".btn-qty-minus");
+        const plusBtn = card.querySelector(".btn-qty-plus");
+        const qtySpan = card.querySelector(".produk-qty-val");
+        const addBtn = card.querySelector(".btn-add-cart");
+
+        const nama = card.dataset.nama;
+        const harga = Number(card.dataset.harga);
+
+        // tombol -
+        minusBtn.addEventListener("click", () => {
+          let qty = Number(qtySpan.textContent) || 0;
+          if (qty > 0) qty--;
+          qtySpan.textContent = qty;
+        });
+
+        // tombol +
+        plusBtn.addEventListener("click", () => {
+          let qty = Number(qtySpan.textContent) || 0;
+          qty++;
+          qtySpan.textContent = qty;
+        });
+
+        // tombol Masuk Keranjang
+        addBtn.addEventListener("click", () => {
+          const qty = Number(qtySpan.textContent) || 0;
+          if (qty <= 0) {
+            alert("Jumlah pesanan belum diatur.");
+            return;
+          }
+
+          const currentUser =
+            typeof getCurrentUser === "function" ? getCurrentUser() : null;
+          if (!currentUser) {
+            alert("Silakan login terlebih dahulu sebelum memesan.");
+            window.location.href = "auth.html";
+            return;
+          }
+
+          // pakai addOrder dari app.js biar format data konsisten
+          if (typeof addOrder === "function") {
+            const total = harga * qty;
+            addOrder(nama, qty, total);
+          } else {
+            alert("Fungsi addOrder belum tersedia.");
+            return;
+          }
+
+          alert("Keranjang diperbarui. Silakan cek di halaman Order.");
+          // kalau mau langsung pindah:
+          // window.location.href = "order.html";
+        });
+      });
+    });
+  </script>
 </body>
 </html>
