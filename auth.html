@@ -38,7 +38,13 @@
   </section>
 </main>
 
-
-  <script src="app.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://wqetnnxwslqofwemrlzi.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxZXRubnh3c2xxb2Z3ZW1ybHppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxMTU3MTksImV4cCI6MjA4MDY5MTcxOX0.sbMU0dJUXR7EZbxcdm9BFay8UTw2FnAQVelJyTLDIRk';
+  const { createClient } = supabase;
+  window.supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+<script src="app.js"></script>
 </body>
 </html>

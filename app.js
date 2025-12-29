@@ -1,4 +1,4 @@
-// ====== LOCALSTORAGE ======
+// ====== UTIL LOCALSTORAGE ======
 function getData(key, defaultValue) {
   const raw = localStorage.getItem(key);
   if (!raw) return defaultValue;
@@ -13,47 +13,80 @@ function setData(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-const KEY_USERS = 'ls_users';
+// ====== KONSTANTA KEY ======
 const KEY_CURRENT_USER = 'ls_current_user';
 const KEY_ORDERS = 'ls_orders';
 
-// ====== FUNGSI USER / AUTH ======
-function getCurrentUser() {
-  const users = getData(KEY_USERS, []);
-  const currentId = getData(KEY_CURRENT_USER, null);
-  if (!currentId) return null;
-  return users.find(u => u.id === currentId) || null;
-}
+// ====== FUNGSI USER / AUTH (SUPABASE) ======
+async function registerUser(nama, email, password) {
+  if (!window.supabaseClient) {
+    alert('Supabase belum siap.');
+    return false;
+  }
 
-function saveUserList(users) {
-  setData(KEY_USERS, users);
-}
+  const { data: existing } = await supabaseClient
+    .from('users')
+    .select('id')
+    .eq('email', email)
+    .maybeSingle();
 
-function registerUser(nama, email, password) {
-  const users = getData(KEY_USERS, []);
-  if (users.some(u => u.email === email)) {
+  if (existing) {
     alert('Email sudah terdaftar');
     return false;
   }
-  const id = Date.now();
-  const user = { id, nama, email, password, addresses: [] };
-  users.push(user);
-  saveUserList(users);
-  setData(KEY_CURRENT_USER, id);
+
+  const { data, error } = await supabaseClient
+    .from('users')
+    .insert({ nama, email, password })
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+    alert('Registrasi gagal.');
+    return false;
+  }
+
+  setData(KEY_CURRENT_USER, data.id);
   alert('Registrasi berhasil. Anda sudah login.');
   return true;
 }
 
-function loginUser(email, password) {
-  const users = getData(KEY_USERS, []);
-  const user = users.find(u => u.email === email && u.password === password);
-  if (!user) {
+async function loginUser(email, password) {
+  if (!window.supabaseClient) {
+    alert('Supabase belum siap.');
+    return false;
+  }
+
+  const { data, error } = await supabaseClient
+    .from('users')
+    .select('*')
+    .eq('email', email)
+    .eq('password', password)
+    .maybeSingle();
+
+  if (error || !data) {
     alert('Email atau password salah');
     return false;
   }
-  setData(KEY_CURRENT_USER, user.id);
+
+  setData(KEY_CURRENT_USER, data.id);
   alert('Login berhasil.');
   return true;
+}
+
+async function getCurrentUser() {
+  const currentId = getData(KEY_CURRENT_USER, null);
+  if (!currentId) return null;
+  if (!window.supabaseClient) return null;
+
+  const { data } = await supabaseClient
+    .from('users')
+    .select('*')
+    .eq('id', currentId)
+    .maybeSingle();
+
+  return data || null;
 }
 
 function logoutUser() {
@@ -62,13 +95,13 @@ function logoutUser() {
   location.reload();
 }
 
-// ====== TOMBOL LOGIN/LOGOUT/PROFIL ======
-function updateAuthUI() {
+// ====== UPDATE TOMBOL LOGIN/LOGOUT/PROFIL ======
+async function updateAuthUI() {
   const btnLoginOpen = document.getElementById('btn-login-open');
   const btnLogout = document.getElementById('btn-logout');
   const btnProfil = document.getElementById('btn-profil');
 
-  const currentUser = getCurrentUser();
+  const currentUser = await getCurrentUser();
 
   if (currentUser) {
     if (btnLoginOpen) btnLoginOpen.style.display = 'none';
@@ -89,40 +122,72 @@ function updateAuthUI() {
 }
 
 // ====== PROFIL: EDIT & HAPUS AKUN ======
-function updateProfile(namaBaru, emailBaru) {
-  const users = getData(KEY_USERS, []);
-  const currentId = getData(KEY_CURRENT_USER, null);
-  if (!currentId) {
+async function updateProfile(namaBaru, emailBaru) {
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
     alert('Anda belum login');
     return;
   }
-  const idx = users.findIndex(u => u.id === currentId);
-  if (idx === -1) return;
 
-  if (emailBaru && emailBaru !== users[idx].email) {
-    if (users.some(u => u.email === emailBaru)) {
+  if (!window.supabaseClient) {
+    alert('Supabase belum siap.');
+    return;
+  }
+
+  if (emailBaru && emailBaru !== currentUser.email) {
+    const { data: existing } = await supabaseClient
+      .from('users')
+      .select('id')
+      .eq('email', emailBaru)
+      .maybeSingle();
+
+    if (existing && existing.id !== currentUser.id) {
       alert('Email sudah dipakai user lain');
       return;
     }
-    users[idx].email = emailBaru;
   }
-  if (namaBaru) users[idx].nama = namaBaru;
 
-  saveUserList(users);
+  const updates = {};
+  if (namaBaru) updates.nama = namaBaru;
+  if (emailBaru) updates.email = emailBaru;
+
+  const { error } = await supabaseClient
+    .from('users')
+    .update(updates)
+    .eq('id', currentUser.id);
+
+  if (error) {
+    console.error(error);
+    alert('Gagal memperbarui profil.');
+    return;
+  }
+
   alert('Profil berhasil diperbarui.');
 }
 
-function deleteAccount() {
-  const currentUser = getCurrentUser();
+async function deleteAccount() {
+  const currentUser = await getCurrentUser();
   if (!currentUser) {
     alert('Anda belum login');
     return;
   }
   if (!confirm('Yakin ingin menghapus akun? Semua data akan hilang.')) return;
 
-  let users = getData(KEY_USERS, []);
-  users = users.filter(u => u.id !== currentUser.id);
-  saveUserList(users);
+  if (!window.supabaseClient) {
+    alert('Supabase belum siap.');
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from('users')
+    .delete()
+    .eq('id', currentUser.id);
+
+  if (error) {
+    console.error(error);
+    alert('Gagal menghapus akun.');
+    return;
+  }
 
   let orders = getData(KEY_ORDERS, []);
   orders = orders.filter(o => o.userId !== currentUser.id);
@@ -133,17 +198,18 @@ function deleteAccount() {
   window.location.href = 'index.html';
 }
 
-// ====== ALAMAT PENGIRIMAN (DI PROFIL) ======
-function addAddress(dataAlamat) {
-  const currentUser = getCurrentUser();
+// ====== ALAMAT PENGIRIMAN ======
+async function addAddress(dataAlamat) {
+  const currentUser = await getCurrentUser();
   if (!currentUser) {
     alert('Harus login dulu untuk mengelola alamat.');
     return;
   }
 
-  const users = getData(KEY_USERS, []);
-  const idx = users.findIndex(u => u.id === currentUser.id);
-  if (idx === -1) return;
+  if (!window.supabaseClient) {
+    alert('Supabase belum siap.');
+    return;
+  }
 
   const addr = {
     id: Date.now(),
@@ -154,62 +220,84 @@ function addAddress(dataAlamat) {
     kodepos: dataAlamat.kodepos
   };
 
-  if (!users[idx].addresses) users[idx].addresses = [];
-  users[idx].addresses.push(addr);
-  saveUserList(users);
+  const addresses = currentUser.addresses || [];
+  addresses.push(addr);
+
+  const { error } = await supabaseClient
+    .from('users')
+    .update({ addresses })
+    .eq('id', currentUser.id);
+
+  if (error) {
+    console.error(error);
+    alert('Gagal menambah alamat.');
+    return;
+  }
+
   alert('Alamat ditambahkan.');
   renderAddressList();
 }
 
-function updateAddress(id, dataAlamat) {
-  const currentUser = getCurrentUser();
+async function updateAddress(id, dataAlamat) {
+  const currentUser = await getCurrentUser();
   if (!currentUser) return;
+  if (!window.supabaseClient) return;
 
-  const users = getData(KEY_USERS, []);
-  const idx = users.findIndex(u => u.id === currentUser.id);
-  if (idx === -1) return;
-
-  const addrs = users[idx].addresses || [];
-  const aIdx = addrs.findIndex(a => a.id === id);
+  const addresses = currentUser.addresses || [];
+  const aIdx = addresses.findIndex(a => a.id === id);
   if (aIdx === -1) return;
 
-  addrs[aIdx] = { ...addrs[aIdx], ...dataAlamat };
-  users[idx].addresses = addrs;
-  saveUserList(users);
+  addresses[aIdx] = { ...addresses[aIdx], ...dataAlamat };
+
+  const { error } = await supabaseClient
+    .from('users')
+    .update({ addresses })
+    .eq('id', currentUser.id);
+
+  if (error) {
+    console.error(error);
+    alert('Gagal memperbarui alamat.');
+    return;
+  }
+
   alert('Alamat diperbarui.');
   renderAddressList();
 }
 
-function deleteAddress(id) {
-  const currentUser = getCurrentUser();
+async function deleteAddress(id) {
+  const currentUser = await getCurrentUser();
   if (!currentUser) return;
   if (!confirm('Hapus alamat ini?')) return;
+  if (!window.supabaseClient) return;
 
-  const users = getData(KEY_USERS, []);
-  const idx = users.findIndex(u => u.id === currentUser.id);
-  if (idx === -1) return;
+  const addresses = (currentUser.addresses || []).filter(a => a.id !== id);
 
-  const addrs = users[idx].addresses || [];
-  users[idx].addresses = addrs.filter(a => a.id !== id);
-  saveUserList(users);
+  const { error } = await supabaseClient
+    .from('users')
+    .update({ addresses })
+    .eq('id', currentUser.id);
+
+  if (error) {
+    console.error(error);
+    alert('Gagal menghapus alamat.');
+    return;
+  }
+
   renderAddressList();
 }
 
-function renderAddressList() {
+async function renderAddressList() {
   const container = document.getElementById('alamat-list');
   if (!container) return;
 
-  const currentUser = getCurrentUser();
+  const currentUser = await getCurrentUser();
   if (!currentUser) {
     container.innerHTML = '<p>Silakan login untuk mengelola alamat.</p>';
     return;
   }
 
-  const users = getData(KEY_USERS, []);
-  const idx = users.findIndex(u => u.id === currentUser.id);
-  if (idx === -1) return;
+  const addrs = currentUser.addresses || [];
 
-  const addrs = users[idx].addresses || [];
   if (!addrs.length) {
     container.innerHTML = '<p>Belum ada alamat tersimpan.</p>';
     return;
@@ -226,7 +314,6 @@ function renderAddressList() {
       </div>
     `;
   });
-
   container.innerHTML = html;
 
   container.querySelectorAll('.btn-edit-alamat').forEach(btn => {
@@ -235,7 +322,6 @@ function renderAddressList() {
       const id = Number(parent.dataset.id);
       const a = addrs.find(x => x.id === id);
       if (!a) return;
-
       document.getElementById('alamat-nama').value = a.nama;
       document.getElementById('alamat-hp').value = a.hp;
       document.getElementById('alamat-detail').value = a.detail;
@@ -254,32 +340,28 @@ function renderAddressList() {
   });
 }
 
-// alamat pertama user
-function getPrimaryAddress() {
-  const currentUser = getCurrentUser();
+async function getPrimaryAddress() {
+  const currentUser = await getCurrentUser();
   if (!currentUser) return null;
-
-  const users = getData(KEY_USERS, []);
-  const u = users.find(x => x.id === currentUser.id);
-  if (!u || !u.addresses || !u.addresses.length) return null;
-  return u.addresses[0];
+  if (!currentUser.addresses || !currentUser.addresses.length) return null;
+  return currentUser.addresses[0];
 }
 
-// ====== REVIEW / ULASAN ======
+// ====== REVIEW / ULASAN (SUPABASE) ======
 let currentEditingReviewId = null;
 
 async function addReview(produkId, rating, text) {
-  const currentUser = getCurrentUser();
+  const currentUser = await getCurrentUser();
   if (!currentUser) {
     alert('Harus login untuk mengirim ulasan.');
     return;
   }
+
   if (!window.supabaseClient) {
     alert('Supabase belum siap.');
     return;
   }
 
-  // kalau sedang mode edit, jangan insert baru tapi update
   if (currentEditingReviewId) {
     await updateReview(currentEditingReviewId, produkId, rating, text);
     currentEditingReviewId = null;
@@ -291,7 +373,7 @@ async function addReview(produkId, rating, text) {
     .from('reviews')
     .insert({
       produkId,
-      userId: currentUser.id,      // pastikan kolom ini ada di tabel
+      userId: currentUser.id,
       userName: currentUser.nama,
       rating: Number(rating),
       text
@@ -308,19 +390,15 @@ async function addReview(produkId, rating, text) {
 }
 
 async function updateReview(id, produkId, rating, text) {
-  const currentUser = getCurrentUser();
+  const currentUser = await getCurrentUser();
   if (!currentUser) return;
   if (!window.supabaseClient) return;
 
   const { error } = await supabaseClient
     .from('reviews')
-    .update({
-      produkId,
-      rating: Number(rating),
-      text
-    })
+    .update({ produkId, rating: Number(rating), text })
     .eq('id', id)
-    .eq('userId', currentUser.id);   // supaya cuma bisa edit punyanya sendiri
+    .eq('userId', currentUser.id);
 
   if (error) {
     console.error(error);
@@ -331,10 +409,9 @@ async function updateReview(id, produkId, rating, text) {
 }
 
 async function deleteReview(id) {
-  const currentUser = getCurrentUser();
+  const currentUser = await getCurrentUser();
   if (!currentUser) return;
   if (!window.supabaseClient) return;
-
   if (!confirm('Hapus ulasan ini?')) return;
 
   const { error } = await supabaseClient
@@ -372,29 +449,27 @@ async function renderAllReviews(filterProdukId) {
   }
 
   const { data: reviews, error } = await query;
+
   if (error) {
     console.error(error);
     container.innerHTML = '<p>Gagal memuat ulasan.</p>';
     return;
   }
 
-  // hitung summary
-  const counts = {1:0,2:0,3:0,4:0,5:0};
+  const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
   reviews.forEach(r => {
     if (counts[r.rating] != null) counts[r.rating] += 1;
   });
-
   const total = reviews.length;
   let sum = 0;
   Object.keys(counts).forEach(k => {
     sum += Number(k) * counts[k];
   });
-  const avg = total ? (sum / total) : 0;
+  const avg = total ? sum / total : 0;
 
   const totalEl = document.getElementById('total-reviews');
   const avgEl = document.getElementById('avg-rating');
   const starsEl = document.getElementById('avg-stars');
-
   if (totalEl) totalEl.textContent = total + ' reviews';
   if (avgEl) avgEl.textContent = avg.toFixed(1);
   if (starsEl) {
@@ -415,7 +490,7 @@ async function renderAllReviews(filterProdukId) {
     }
   }
 
-  const currentUser = getCurrentUser();
+  const currentUser = await getCurrentUser();
   const produkNames = {
     large: 'Lemon Sereh - Cup Large',
     medium: 'Lemon Sereh - Cup Medium',
@@ -432,11 +507,8 @@ async function renderAllReviews(filterProdukId) {
     const namaProduk = produkNames[r.produkId] || r.produkId;
     const stars = '⭐'.repeat(r.rating);
     const isOwner = currentUser && r.userId === currentUser.id;
-
     html += `
-      <div class="ulasan-item" data-review-id="${r.id}"
-           data-produk-id="${r.produkId}" data-rating="${r.rating}"
-           data-text="${r.text.replace(/"/g, '&quot;')}">
+      <div class="ulasan-item" data-review-id="${r.id}" data-produk-id="${r.produkId}" data-rating="${r.rating}" data-text="${r.text.replace(/"/g, '&quot;')}">
         <div class="ulasan-item-header">
           <div>
             <div class="ulasan-item-nama">${r.userName}</div>
@@ -457,7 +529,6 @@ async function renderAllReviews(filterProdukId) {
 
   container.innerHTML = html;
 
-  // event edit & hapus
   container.querySelectorAll('.btn-ulasan-edit').forEach(btn => {
     btn.addEventListener('click', () => {
       const item = btn.closest('.ulasan-item');
@@ -466,7 +537,6 @@ async function renderAllReviews(filterProdukId) {
       const rating = item.dataset.rating;
       const text = item.dataset.text;
 
-      // isi form global
       const selectProduk = document.getElementById('ulasan-produk');
       const selectRating = document.getElementById('ulasan-rating');
       const textarea = document.getElementById('ulasan-text');
@@ -475,7 +545,8 @@ async function renderAllReviews(filterProdukId) {
       if (textarea) textarea.value = text;
 
       currentEditingReviewId = id;
-      const btnSubmit = document.querySelector('#form-ulasan-global button[type="submit"]');
+
+      const btnSubmit = document.querySelector('form#form-ulasan-global button[type="submit"]');
       if (btnSubmit) btnSubmit.textContent = 'Update Ulasan';
     });
   });
@@ -496,51 +567,50 @@ function renderAllReviewsCurrentFilter() {
   }
 }
 
-// ====== ORDER: SIMPAN LIST DI LOCALSTORAGE ======
-function getUserOrders() {
-  const currentUser = getCurrentUser();
+// ====== ORDER (LOCALSTORAGE) ======
+async function getUserOrders() {
+  const currentUser = await getCurrentUser();
   if (!currentUser) return [];
-  const orders = getData(KEY_ORDERS, []) || [];
+  const orders = getData(KEY_ORDERS, []);
   return orders.filter(o => o.userId === currentUser.id);
 }
 
-function updateOrderQty(orderId, newQty) {
-  const currentUser = getCurrentUser();
+async function updateOrderQty(orderId, newQty) {
+  const currentUser = await getCurrentUser();
   if (!currentUser) return;
 
-  let orders = getData(KEY_ORDERS, []) || [];
+  let orders = getData(KEY_ORDERS, []);
   const idx = orders.findIndex(o => o.id === orderId && o.userId === currentUser.id);
   if (idx === -1) return;
 
   if (newQty <= 0) {
-    orders = orders.filter(o => o.id !== orderId || o.userId !== currentUser.id);
+    orders = orders.filter(o => !(o.id === orderId && o.userId === currentUser.id));
   } else {
     const order = orders[idx];
-    const hargaSatuan = order.totalHarga / Math.max(order.qty || 1, 1);
+    const hargaSatuan = order.totalHarga / Math.max(order.qty, 1);
     order.qty = newQty;
     order.totalHarga = hargaSatuan * newQty;
     orders[idx] = order;
   }
-
   setData(KEY_ORDERS, orders);
 }
 
-function deleteOrder(orderId) {
-  const currentUser = getCurrentUser();
+async function deleteOrder(orderId) {
+  const currentUser = await getCurrentUser();
   if (!currentUser) return;
   if (!confirm('Hapus pesanan ini?')) return;
 
-  let orders = getData(KEY_ORDERS, []) || [];
-  orders = orders.filter(o => o.id !== orderId || o.userId !== currentUser.id);
+  let orders = getData(KEY_ORDERS, []);
+  orders = orders.filter(o => !(o.id === orderId && o.userId === currentUser.id));
   setData(KEY_ORDERS, orders);
   renderOrderList();
 }
 
-function renderOrderList() {
+async function renderOrderList() {
   const container = document.getElementById('order-list');
   if (!container) return;
 
-  const orders = getUserOrders();
+  const orders = await getUserOrders();
   if (!orders.length) {
     container.innerHTML = '<p>Belum ada pesanan.</p>';
     return;
@@ -583,9 +653,7 @@ function renderOrderList() {
         updateOrderQty(id, qty);
         qtySpan.textContent = qty;
       } else {
-        if (confirm('Hapus pesanan ini?')) {
-          deleteOrder(id);
-        }
+        if (confirm('Hapus pesanan ini?')) deleteOrder(id);
       }
       if (typeof updateOrderFooter === 'function') updateOrderFooter();
     });
@@ -609,19 +677,20 @@ function renderOrderList() {
   });
 }
 
-function addOrder(namaProduk, qty, totalHarga) {
-  const currentUser = getCurrentUser();
+async function addOrder(namaProduk, qty, totalHarga) {
+  const currentUser = await getCurrentUser();
   if (!currentUser) {
     alert('Silakan login terlebih dahulu sebelum memesan.');
     window.location.href = 'auth.html';
     return;
   }
 
-  const orders = getData(KEY_ORDERS, []) || [];
+  const orders = getData(KEY_ORDERS, []);
   let existing = orders.find(o => o.userId === currentUser.id && o.namaProduk === namaProduk);
+
   if (existing) {
-    existing.qty = qty;
-    existing.totalHarga = totalHarga;
+    existing.qty += qty;
+    existing.totalHarga += totalHarga;
   } else {
     const order = {
       id: Date.now(),
@@ -632,36 +701,35 @@ function addOrder(namaProduk, qty, totalHarga) {
     };
     orders.push(order);
   }
-
   setData(KEY_ORDERS, orders);
   renderOrderList();
 }
 
 // ====== INISIALISASI PER HALAMAN ======
-document.addEventListener('DOMContentLoaded', () => {
-  updateAuthUI();
+document.addEventListener('DOMContentLoaded', async () => {
+  await updateAuthUI();
 
   const formLogin = document.getElementById('form-login');
   const formRegister = document.getElementById('form-register');
 
   if (formLogin) {
-    formLogin.addEventListener('submit', e => {
+    formLogin.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
-      if (loginUser(email, password)) {
+      if (await loginUser(email, password)) {
         window.location.href = 'index.html';
       }
     });
   }
 
   if (formRegister) {
-    formRegister.addEventListener('submit', e => {
+    formRegister.addEventListener('submit', async (e) => {
       e.preventDefault();
       const nama = document.getElementById('reg-nama').value;
       const email = document.getElementById('reg-email').value;
       const password = document.getElementById('reg-password').value;
-      if (registerUser(nama, email, password)) {
+      if (await registerUser(nama, email, password)) {
         window.location.href = 'index.html';
       }
     });
@@ -669,91 +737,112 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const profilNama = document.getElementById('profil-nama');
   const profilEmail = document.getElementById('profil-email');
-  if (profilNama && profilEmail) {
-    const currentUser = getCurrentUser();
+
+    if (profilNama && profilEmail) {
+    const currentUser = await getCurrentUser();
     if (!currentUser) {
       alert('Silakan login terlebih dahulu.');
       window.location.href = 'auth.html';
       return;
     }
+
     profilNama.textContent = currentUser.nama;
     profilEmail.textContent = currentUser.email;
+
+    const profilNamaText = document.getElementById('profil-nama-text');
+    if (profilNamaText) profilNamaText.textContent = currentUser.nama;
+
+    const formProfil = document.getElementById('form-profil');
+    if (formProfil) {
+      formProfil.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const currentUser = await getCurrentUser();
+        if (!currentUser) return;
+
+        const nama = document.getElementById('edit-nama')?.value || currentUser.nama;
+        const email = document.getElementById('edit-email')?.value || currentUser.email;
+        await updateProfile(nama, email);
+        window.location.reload();
+      });
+    }
+
+    const btnHapusAkun = document.getElementById('btn-hapus-akun');
+    if (btnHapusAkun) {
+      btnHapusAkun.addEventListener('click', () => {
+        deleteAccount();
+      });
+    }
+
+    const formAlamat = document.getElementById('form-alamat');
+    if (formAlamat) {
+      formAlamat.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nama = document.getElementById('alamat-nama').value;
+        const hpStr = document.getElementById('alamat-hp').value;
+        const detail = document.getElementById('alamat-detail').value;
+        const kota = document.getElementById('alamat-kota').value;
+        const kodeposStr = document.getElementById('alamat-kodepos').value;
+
+        const hp = Number(hpStr);
+        const kodepos = Number(kodeposStr);
+
+        if (!Number.isInteger(hp) || hp <= 0) {
+          alert('No. HP harus berupa angka.');
+          return;
+        }
+        if (!Number.isInteger(kodepos) || kodepos <= 0) {
+          alert('Kode pos harus berupa angka.');
+          return;
+        }
+
+        const data = { nama, hp, detail, kota, kodepos };
+        const container = document.getElementById('alamat-list');
+        const editId = container.dataset.editId;
+        if (editId) {
+          await updateAddress(Number(editId), data);
+          delete container.dataset.editId;
+        } else {
+          await addAddress(data);
+        }
+        formAlamat.reset();
+      });
+    }
+
+    await renderAddressList();
   }
 
-  const profilNamaText = document.getElementById('profil-nama-text');
-  if (profilNamaText) {
-    const currentUser = getCurrentUser();
-    if (currentUser) profilNamaText.textContent = currentUser.nama;
+  await renderOrderList();
+
+  const ulasanList = document.getElementById('ulasan-list');
+  if (ulasanList && window.supabaseClient) {
+    const filterSelect = document.getElementById('filterProduk');
+    if (filterSelect) {
+      filterSelect.addEventListener('change', () => {
+        renderAllReviews(filterSelect.value);
+      });
+    }
+    await renderAllReviews('all');
   }
 
-  const formProfil = document.getElementById('form-profil');
-  if (formProfil) {
-    formProfil.addEventListener('submit', e => {
+  // Form ulasan global (kalau ada di ulasan.html)
+  const formUlasanGlobal = document.getElementById('form-ulasan-global');
+  if (formUlasanGlobal) {
+    formUlasanGlobal.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const currentUser = getCurrentUser();
-      if (!currentUser) return;
-      const nama = document.getElementById('edit-nama')?.value || currentUser.nama;
-      const email = document.getElementById('edit-email')?.value || currentUser.email;
-      updateProfile(nama, email);
-      window.location.reload();
+      const produkId = document.getElementById('ulasan-produk')?.value;
+      const rating = document.getElementById('ulasan-rating')?.value;
+      const text = document.getElementById('ulasan-text')?.value;
+
+      if (!produkId || !rating || !text.trim()) {
+        alert('Rating dan ulasan wajib diisi.');
+        return;
+      }
+
+      await addReview(produkId, rating, text);
+      formUlasanGlobal.reset();
+      currentEditingReviewId = null;
+      const btnSubmit = formUlasanGlobal.querySelector('button[type="submit"]');
+      if (btnSubmit) btnSubmit.textContent = 'Kirim Ulasan';
     });
   }
-
-  const btnHapusAkun = document.getElementById('btn-hapus-akun');
-  if (btnHapusAkun) {
-    btnHapusAkun.addEventListener('click', deleteAccount);
-  }
-
-const formAlamat = document.getElementById('form-alamat');
-if (formAlamat) {
-  formAlamat.addEventListener('submit', e => {
-    e.preventDefault();
-
-    const nama = document.getElementById('alamat-nama').value;
-    const hpStr = document.getElementById('alamat-hp').value;
-    const detail = document.getElementById('alamat-detail').value;
-    const kota = document.getElementById('alamat-kota').value;
-    const kodeposStr = document.getElementById('alamat-kodepos').value;
-
-    const hp = Number(hpStr);
-    const kodepos = Number(kodeposStr);
-
-    if (!Number.isInteger(hp) || hp <= 0) {
-      alert('No. HP harus berupa angka.');
-      return;
-    }
-    if (!Number.isInteger(kodepos) || kodepos <= 0) {
-      alert('Kode pos harus berupa angka.');
-      return;
-    }
-
-    const data = {
-      nama,
-      hp,        // integer
-      detail,
-      kota,
-      kodepos    // integer
-    };
-
-    const container = document.getElementById('alamat-list');
-    const editId = container.dataset.editId;
-
-    if (editId) {
-      updateAddress(Number(editId), data);
-      delete container.dataset.editId;
-    } else {
-      addAddress(data);
-    }
-
-    formAlamat.reset();
-    renderAddressList();
-  });
-
-  renderAddressList();
-}
-
-  // inisialisasi ulasan, dsb (kalau ada) ...
-
-  // inisialisasi order list (kalau ada di halaman)
-  renderOrderList();
 });
